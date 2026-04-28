@@ -1,8 +1,7 @@
-from typing import TypedDict
 from pydantic import BaseModel, Field
 
 
-class LevelType(TypedDict):
+class LevelType(BaseModel):
     width: int
     height: int
 
