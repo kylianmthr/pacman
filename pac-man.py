@@ -1,6 +1,4 @@
-from src.parser import Parser
 from src.engine import Engine
-from mazegen import generator
 
 if __name__ == "__main__":
     # parser = Parser("config.json")

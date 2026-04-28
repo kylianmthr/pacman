@@ -2,7 +2,7 @@ import pygame
 
 
 class Engine:
-    def __init__(self):
+    def __init__(self) -> None:
         self.running = True
         self.frame_rate = 60
         self.screen_width = 800
