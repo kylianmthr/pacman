@@ -1,12 +1,14 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class LevelType(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     width: int
     height: int
 
 
 class Config(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     highscore_filename: str
     level: list[LevelType]
     lives: int = Field(ge=1)
