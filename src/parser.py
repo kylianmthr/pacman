@@ -13,11 +13,9 @@ class Parser:
             self.content = f.read()
             lines = self.content.split("\n")
             for i in range(len(lines) - 1):
-                print(i)
                 if lines[i].strip().startswith("#"):
                     lines.pop(i)
             self.content = "\n".join(lines)
-            print(self.content)
 
     def parse(self) -> Config:
         if self.content:

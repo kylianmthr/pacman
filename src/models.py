@@ -3,8 +3,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class LevelType(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    width: int
-    height: int
+    width: int = Field(ge=3)
+    height: int = Field(ge=3)
 
 
 class Config(BaseModel):
