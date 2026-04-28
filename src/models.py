@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict, Field
+from typing import Optional
 
 
 class LevelType(BaseModel):
@@ -18,3 +19,14 @@ class Config(BaseModel):
     points_per_ghost: int = Field(ge=0)
     seed: int
     level_max_time: int = Field(ge=0)
+
+
+class Player(BaseModel):
+    name: Optional[str] = Field(
+        default=None, min_length=1, max_length=10, pattern=r"^[a-zA-Z0-9 ]+$"
+    )
+    score: int = Field(default=0, ge=0)
+
+
+class HighScore(BaseModel):
+    best_players: list[Player] = []
