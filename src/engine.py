@@ -8,8 +8,8 @@ class Engine:
     def __init__(self, width: int, height: int, seed: int) -> None:
         self.running = True
         self.frame_rate = 60
-        self.screen_width = 800
-        self.screen_height = 600
+        self.screen_width = width * 40 + 10
+        self.screen_height = height * 40 + 40
         self.width = width
         self.height = height
         self.screen = pygame.display.set_mode(
