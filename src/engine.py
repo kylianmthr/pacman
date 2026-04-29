@@ -1,5 +1,6 @@
 import pygame
 
+from src.player import Player
 from src.wall import Wall
 from mazegen import generator
 
@@ -16,6 +17,8 @@ class Engine:
             (self.screen_width, self.screen_height)
         )
         self.clock = pygame.time.Clock()
+        self.sprites = pygame.sprite.Group()
+        self.sprites.add(Player())
         self.walls = pygame.sprite.Group()
         self.maze = generator.MazeGenerator(
             self.width,
@@ -42,23 +45,35 @@ class Engine:
                         Wall(30, 30, (10 + offset_x, 10 + offset_y), "blue")
                     ]
                 self.walls.add(walls)
+                self.sprites.add(walls)
                 offset_x += 40
             offset_y += 40
         bottom_wall = Wall(40 * self.width + 10, 10, (0, offset_y))
         self.walls.add(bottom_wall)
+        self.sprites.add(bottom_wall)
         right_wall = Wall(10, 40 * self.height + 10, (40 * self.width, 0))
         self.walls.add(right_wall)
+        self.sprites.add(right_wall)
 
     def event(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            if event.type == pygame.KEYDOWN:
+                walls = self.walls.sprites()
+                walls[1] = walls[1].image.fill("blue")
+                self.screen.fill("black")
+                self.walls.draw(self.screen)
+                pygame.display.flip()
 
     def run(self) -> None:
         pygame.init()
-        self.walls.draw(self.screen)
+        self.sprites.draw(self.screen)
         pygame.display.flip()
         while self.running:
             self.event()
+            self.sprites.sprites()[0].walk()
+            self.screen.fill("black")
+            self.sprites.draw(self.screen)
             self.clock.tick(self.frame_rate)
         pygame.quit()
