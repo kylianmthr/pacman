@@ -43,7 +43,8 @@ class Player(pygame.sprite.Sprite):
                 self.get_sprite(self.sprite_sheet, (i, 3), 24, 24, 1)
             )
 
-    def walk(self):
+    def update(self):
         if self.direction == Direction.SOUTH:
             self.rect.y += 2
             self.current_frame = 5 if self.current_frame == 7 else 7
+            self.image = self.images[self.current_frame]

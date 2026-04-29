@@ -68,12 +68,11 @@ class Engine:
 
     def run(self) -> None:
         pygame.init()
-        self.sprites.draw(self.screen)
-        pygame.display.flip()
         while self.running:
             self.event()
-            self.sprites.sprites()[0].walk()
+            self.sprites.update()
             self.screen.fill("black")
             self.sprites.draw(self.screen)
+            pygame.display.flip()
             self.clock.tick(self.frame_rate)
         pygame.quit()
