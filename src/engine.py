@@ -1,14 +1,15 @@
 import pygame
 
-from src.player import Player
 from src.wall import Wall
 from mazegen import generator
 
 
 class Engine:
     def __init__(self, width: int, height: int, seed: int) -> None:
+        from src.player import Player
+
         self.running = True
-        self.frame_rate = 60
+        self.frame_rate = 120
         self.screen_width = width * 40 + 10
         self.screen_height = height * 40 + 40
         self.width = width
@@ -18,7 +19,10 @@ class Engine:
         )
         self.clock = pygame.time.Clock()
         self.sprites = pygame.sprite.Group()
-        self.sprites.add(Player())
+        player = Player(self)
+        player.rect.x = 10
+        player.rect.y = 10
+        self.sprites.add(player)
         self.walls = pygame.sprite.Group()
         self.maze = generator.MazeGenerator(
             self.width,
@@ -56,15 +60,27 @@ class Engine:
         self.sprites.add(right_wall)
 
     def event(self) -> None:
+        from src.player import Direction
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
             if event.type == pygame.KEYDOWN:
-                walls = self.walls.sprites()
-                walls[1] = walls[1].image.fill("blue")
-                self.screen.fill("black")
-                self.walls.draw(self.screen)
-                pygame.display.flip()
+                player = self.sprites.sprites()[0]
+                old_direction = player.direction
+                if event.key == pygame.K_LEFT:
+                    player.disered_direction = Direction.WEST
+                if event.key == pygame.K_DOWN:
+                    player.disered_direction = Direction.SOUTH
+                if event.key == pygame.K_UP:
+                    player.disered_direction = Direction.NORTH
+                if event.key == pygame.K_RIGHT:
+                    player.disered_direction = Direction.EAST
+                # walls = self.walls.sprites()
+                # walls[1] = walls[1].image.fill("blue")
+                # self.screen.fill("black")
+                # self.walls.draw(self.screen)
+                # pygame.display.flip()
 
     def run(self) -> None:
         pygame.init()
