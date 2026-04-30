@@ -1,5 +1,6 @@
 import pygame
 
+from src.pacgum import Pacgum
 from src.wall import Wall
 from mazegen import generator
 
@@ -9,7 +10,7 @@ class Engine:
         from src.player import Player
 
         self.running = True
-        self.frame_rate = 120
+        self.frame_rate = 60
         self.screen_width = width * 40 + 10
         self.screen_height = height * 40 + 40
         self.width = width
@@ -67,7 +68,6 @@ class Engine:
                 self.running = False
             if event.type == pygame.KEYDOWN:
                 player = self.sprites.sprites()[0]
-                old_direction = player.direction
                 if event.key == pygame.K_LEFT:
                     player.disered_direction = Direction.WEST
                 if event.key == pygame.K_DOWN:
@@ -76,11 +76,6 @@ class Engine:
                     player.disered_direction = Direction.NORTH
                 if event.key == pygame.K_RIGHT:
                     player.disered_direction = Direction.EAST
-                # walls = self.walls.sprites()
-                # walls[1] = walls[1].image.fill("blue")
-                # self.screen.fill("black")
-                # self.walls.draw(self.screen)
-                # pygame.display.flip()
 
     def run(self) -> None:
         pygame.init()
