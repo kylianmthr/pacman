@@ -1,11 +1,14 @@
 import pygame
 
+from src.pacgum import Pacgum
 from src.wall import Wall
 from mazegen import generator
 
 
 class Engine:
     def __init__(self, width: int, height: int, seed: int) -> None:
+        from src.player import Player
+
         self.running = True
         self.frame_rate = 60
         self.screen_width = width * 40 + 10
@@ -16,6 +19,11 @@ class Engine:
             (self.screen_width, self.screen_height)
         )
         self.clock = pygame.time.Clock()
+        self.sprites = pygame.sprite.Group()
+        player = Player(self)
+        player.rect.x = 10
+        player.rect.y = 10
+        self.sprites.add(player)
         self.walls = pygame.sprite.Group()
         self.maze = generator.MazeGenerator(
             self.width,
@@ -42,23 +50,40 @@ class Engine:
                         Wall(30, 30, (10 + offset_x, 10 + offset_y), "blue")
                     ]
                 self.walls.add(walls)
+                self.sprites.add(walls)
                 offset_x += 40
             offset_y += 40
         bottom_wall = Wall(40 * self.width + 10, 10, (0, offset_y))
         self.walls.add(bottom_wall)
+        self.sprites.add(bottom_wall)
         right_wall = Wall(10, 40 * self.height + 10, (40 * self.width, 0))
         self.walls.add(right_wall)
+        self.sprites.add(right_wall)
 
     def event(self) -> None:
+        from src.player import Direction
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            if event.type == pygame.KEYDOWN:
+                player = self.sprites.sprites()[0]
+                if event.key == pygame.K_LEFT:
+                    player.disered_direction = Direction.WEST
+                if event.key == pygame.K_DOWN:
+                    player.disered_direction = Direction.SOUTH
+                if event.key == pygame.K_UP:
+                    player.disered_direction = Direction.NORTH
+                if event.key == pygame.K_RIGHT:
+                    player.disered_direction = Direction.EAST
 
     def run(self) -> None:
         pygame.init()
-        self.walls.draw(self.screen)
-        pygame.display.flip()
         while self.running:
             self.event()
+            self.sprites.update()
+            self.screen.fill("black")
+            self.sprites.draw(self.screen)
+            pygame.display.flip()
             self.clock.tick(self.frame_rate)
         pygame.quit()
