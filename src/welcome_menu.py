@@ -66,6 +66,7 @@ class WelcomeMenu:
     def show_home_menu(self, screen_width, screen_height):
         self.screen_height = screen_height
         self.screen_width = screen_width
+        self.screen.fill("black")
         self.assets.draw(self.screen)
 
     def stop_menu(self):
@@ -193,46 +194,12 @@ class WelcomeMenu:
             )
         )
 
-
-class Engine:
-    def __init__(self, width=10, height=10) -> None:  # on set le min a 10*10 ?
-        self.running = True
-        self.frame_rate = 60
-        self.screen_width = width * 40 + 10
-        self.screen_height = height * 40 + 40
-        self.width = width
-        self.height = height
-        self.screen = pygame.display.set_mode(
-            (self.screen_width, self.screen_height)
-        )
-        self.clock = pygame.time.Clock()
-        self.welcome_menu = WelcomeMenu(
-            self.screen, self.screen_width, self.screen_height
-        )
-
-    def event(self) -> None:
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key in (pygame.K_UP, pygame.K_w):
-                    self.welcome_menu.item_selection(-1)
-                elif event.key in (pygame.K_DOWN, pygame.K_s):
-                    self.welcome_menu.item_selection(+1)
-            if event.type == pygame.QUIT:
-                self.running = False
-
-    def run(self) -> None:
-        pygame.init()
-        while self.running:
-            self.event()
-            self.screen.fill("black")
-            self.welcome_menu.show_home_menu(
-                self.screen_width, self.screen_height
-            )
-            self.clock.tick(self.frame_rate)
-            pygame.display.flip()
-        pygame.quit()
-
-
-if __name__ == "__main__":
-    engine = Engine()
-    engine.run()
+    def event(self, event) -> bool:
+        if event.key == pygame.K_RETURN:
+            if self.buttons[self.button_idx].name == "START":
+                return False
+        if event.key in (pygame.K_UP, pygame.K_w):
+            self.item_selection(-1)
+        elif event.key in (pygame.K_DOWN, pygame.K_s):
+            self.item_selection(+1)
+        return True

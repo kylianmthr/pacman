@@ -2,9 +2,11 @@ import pygame
 from src.wall import Wall
 from mazegen import generator
 
-class Game():
-    def __init__(self, screen, width, height, seed)->None: 
+
+class Game:
+    def __init__(self, screen, width, height, seed) -> None:
         from src.player import Player
+
         self.width = width
         self.height = height
         self.screen = screen
@@ -24,7 +26,7 @@ class Game():
         self.maze.generate((0, 0))
         self.maze.dig()
         self.create_walls()
-    
+
     def create_walls(self) -> None:
         offset_y = 0
         for row in self.maze.maze:
@@ -50,24 +52,21 @@ class Game():
         self.walls.add(right_wall)
         self.sprites.add(right_wall)
 
-    def event(self) -> None:
+    def event(self, event) -> None:
         from src.player import Direction
 
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                player = self.sprites.sprites()[0]
-                if event.key == pygame.K_LEFT:
-                    player.disered_direction = Direction.WEST
-                if event.key == pygame.K_DOWN:
-                    player.disered_direction = Direction.SOUTH
-                if event.key == pygame.K_UP:
-                    player.disered_direction = Direction.NORTH
-                if event.key == pygame.K_RIGHT:
-                    player.disered_direction = Direction.EAST
+        if event.type == pygame.KEYDOWN:
+            player = self.sprites.sprites()[0]
+            if event.key == pygame.K_LEFT:
+                player.disered_direction = Direction.WEST
+            if event.key == pygame.K_DOWN:
+                player.disered_direction = Direction.SOUTH
+            if event.key == pygame.K_UP:
+                player.disered_direction = Direction.NORTH
+            if event.key == pygame.K_RIGHT:
+                player.disered_direction = Direction.EAST
 
-
-    def update(self)->None:
+    def update(self) -> None:
         self.sprites.update()
         self.screen.fill("black")
         self.sprites.draw(self.screen)
-        
