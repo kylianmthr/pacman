@@ -1,6 +1,7 @@
 import pygame
 
 from src.welcome_menu import WelcomeMenu
+from src.menu import Menu
 from src.game import Game
 
 # from src.pacgum import Pacgum
@@ -10,7 +11,7 @@ from mazegen import generator
 
 class Engine:
     def __init__(self, width: int, height: int, seed: int) -> None:
-        self.menu = True
+        self.menu_active = True
         self.running = True
         self.frame_rate = 60
         self.screen_width = width * 40 + 10
@@ -19,7 +20,10 @@ class Engine:
             (self.screen_width, self.screen_height)
         )
         self.clock = pygame.time.Clock()
-        self.welcome_menu = WelcomeMenu(
+        # self.menu = WelcomeMenu(
+        #     self.screen, self.screen_width, self.screen_height
+        # )
+        self.menu = Menu(
             self.screen, self.screen_width, self.screen_height
         )
         self.game = Game(self.screen, width, height, seed)
@@ -27,8 +31,8 @@ class Engine:
     def event(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if self.menu:
-                    self.menu = self.welcome_menu.event(event)
+                if self.menu_active:
+                    self.menu_active = self.menu.event(event)
                 else:
                     self.game.event(event)
             if event.type == pygame.QUIT:
@@ -38,8 +42,8 @@ class Engine:
         pygame.init()
 
         while self.running:
-            if self.menu:
-                self.welcome_menu.show_home_menu(
+            if self.menu_active:
+                self.menu.show(
                     self.screen_width, self.screen_height
                 )
             else:

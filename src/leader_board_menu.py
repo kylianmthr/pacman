@@ -1,20 +1,22 @@
 import pygame
 from pygame.math import Vector2
-from src.menu_sprites import Button, Picture, Text
+from src.menu_sprites import Button, Picture, Text, TextFromRight, TextFromLeft
+from src.models import HighScore, Player
+from pathlib import Path
 
-
-class WelcomeMenu:
+class LeaderBoardMenu:
     def __init__(self, screen, screen_width, screen_height):
         pygame.font.init()
         self.screen = screen
         self.assets = pygame.sprite.Group()
-        self.music_state = "./assets/music_on.png"
         self.screen_width = screen_width
         self.screen_height = screen_height
+        self.high_scores = []
         self.buttons = []
         self.button_idx = 0
         self.cursors_map = {}
         self.create_static_surfaces()
+        self.update_leaderboard_surfaces()
 
     def show(self, screen_width, screen_height):
         self.screen_height = screen_height
@@ -26,22 +28,15 @@ class WelcomeMenu:
         for sprite in self.assets:
             sprite.kill()
 
-    def update_sprite_coordinate(
+    def update_sprite(
         self, sprite: pygame.sprite.Sprite, coordinates: tuple[int, int]
     ):
         sprite.rect = sprite.image.get_rect(center=coordinates)
 
-    def update_sprite_file_path(self, sprite: pygame.sprite.Sprite, path: str):
-        sprite.image = pygame.image.load(self.music_state)
-        sprite.image = pygame.transform.smoothscale(
-            sprite.image, (sprite.scale_width, sprite.scale_height)
-        )
-        sprite.rect = sprite.image.get_rect(center=sprite.coordinates)
-
     def update_cursor(self):
         for sprite in self.assets:
             if sprite.name == "right_selector":
-                self.update_sprite_coordinate(
+                self.update_sprite(
                     sprite,
                     (
                         self.cursors_map[self.buttons[self.button_idx].name][
@@ -51,7 +46,7 @@ class WelcomeMenu:
                     + Vector2(15, 0),
                 )
             if sprite.name == "left_selector":
-                self.update_sprite_coordinate(
+                self.update_sprite(
                     sprite,
                     (
                         self.cursors_map[self.buttons[self.button_idx].name][
@@ -60,11 +55,6 @@ class WelcomeMenu:
                     )
                     + Vector2(-15, 0),
                 )
-
-    def item_selection(self, move: int):
-        if len(self.buttons) > 0:
-            self.button_idx = (self.button_idx + move) % len(self.buttons)
-        self.update_cursor()
 
     def create_static_surfaces(self):
         pacfont = pygame.font.Font("./assets/PAC-FONT.TTF", 35)
@@ -93,55 +83,20 @@ class WelcomeMenu:
                 (self.screen_width // 2, self.screen_height * 0.1 + 40),
             )
         )
+
         self.assets.add(
             Button(
-                "START",
+                "RETURN",
                 swfont,
-                (self.screen_width // 2, self.screen_height * 0.4),
+                (self.screen_width // 2, self.screen_height * 0.25),
                 1,
                 "yellow",
             )
         )
-        self.assets.add(
-            Button(
-                "LEADERBOARD",
-                swfont,
-                (self.screen_width // 2, self.screen_height * 0.4 + 50),
-                2,
-                "yellow",
-            )
-        )
-        self.assets.add(
-            Button(
-                "SETTINGS",
-                swfont,
-                (self.screen_width // 2, self.screen_height * 0.4 + 100),
-                3,
-                "yellow",
-            )
-        )
-        self.assets.add(
-            Button(
-                "music",
-                self.music_state,
-                (self.screen_width * 0.3, self.screen_height * 0.9),
-                4,
-                "",
-            )
-        )
-        self.assets.add(
-            Button(
-                "color",
-                "./assets/color.png",
-                (self.screen_width * 0.7, self.screen_height * 0.9),
-                5,
-                "",
-            )
-        )
+
         self.buttons = [
             button for button in self.assets if isinstance(button, Button)
         ]
-        self.buttons.sort(key=lambda button: button.position)
         self.cursors_map = {
             button.name: {
                 "left": Vector2(button.rect.midleft),
@@ -176,32 +131,47 @@ class WelcomeMenu:
             )
         )
 
+    def update_leaderboard_surfaces(self):
+        [pygame.sprite.Sprite.kill(asset) for asset in self.assets]
+        self.create_static_surfaces()
+        self.data_retriever()
+        super_funnel = pygame.font.Font("./assets/SuperFunnel.ttf", 28)
+        coordinate_player_name = Vector2(
+            self.screen_width * 0.15, self.screen_height * 0.3
+        )
+        coordinate_player_score = Vector2(
+            self.screen_width * 0.85, self.screen_height * 0.3
+        )
+        for player in self.high_scores.best_players:
+            if player.score > 0:
+                coordinate_player_name += Vector2(0, 30)
+                coordinate_player_score += Vector2(0, 30)
+                self.assets.add(
+                    TextFromLeft(
+                        f"{player.name}:",
+                        "yellow",
+                        super_funnel,
+                        coordinate_player_name,
+                    )
+                )
+                self.assets.add(
+                    TextFromRight(
+                        f"{player.score}",
+                        "yellow",
+                        super_funnel,
+                        coordinate_player_score,
+                    )
+                )
+
+    def data_retriever(self):
+        file = Path("high_scores.json")
+        if not file.exists():
+            self.create_json()
+        else:
+            with open("high_scores.json", "r") as file:
+                self.high_scores = HighScore.model_validate_json(file.read())
+
     def event(self, event) -> bool:
         if event.key == pygame.K_RETURN:
-            if self.buttons[self.button_idx].name == "START":
-                return "start"
-            if self.buttons[self.button_idx].name == "LEADERBOARD":
-                return "leaderboard"
-            if self.buttons[self.button_idx].name == "SETTINGS":
-                return "settings"
-            if self.buttons[self.button_idx].name == "music":
-                if self.music_state == "./assets/music_on.png":
-                    self.music_state = "./assets/music_off.png"
-                elif self.music_state == "./assets/music_off.png":
-                    self.music_state = "./assets/music_on.png"
-                for sprite in self.assets:
-                    if sprite.name == "music":
-                        self.update_sprite_file_path(sprite, self.music_state)
-                if self.music_state == "./assets/music_on.png":
-                    return "music_on"
-                else:
-                    return "music_off"
-            if self.buttons[self.button_idx].name == "color":
-                print("change_color")
-                return "change_color"
-
-        if event.key in (pygame.K_UP, pygame.K_w):
-            self.item_selection(-1)
-        elif event.key in (pygame.K_DOWN, pygame.K_s):
-            self.item_selection(+1)
-        return ""
+            return "return"
+        return "stay"
