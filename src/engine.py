@@ -25,8 +25,6 @@ class Engine:
         self.game = Game(self.screen, width, height, seed)
 
     def event(self) -> None:
-        from src.player import Direction
-
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if self.menu:
