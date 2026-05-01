@@ -1,89 +1,50 @@
 import pygame
 
-from src.pacgum import Pacgum
+from src.welcome_menu import WelcomeMenu
+from src.game import Game
+
+# from src.pacgum import Pacgum
 from src.wall import Wall
 from mazegen import generator
 
 
 class Engine:
     def __init__(self, width: int, height: int, seed: int) -> None:
-        from src.player import Player
-
+        self.menu = True
         self.running = True
         self.frame_rate = 60
         self.screen_width = width * 40 + 10
         self.screen_height = height * 40 + 40
-        self.width = width
-        self.height = height
         self.screen = pygame.display.set_mode(
             (self.screen_width, self.screen_height)
         )
         self.clock = pygame.time.Clock()
-        self.sprites = pygame.sprite.Group()
-        player = Player(self)
-        player.rect.x = 10
-        player.rect.y = 10
-        self.sprites.add(player)
-        self.walls = pygame.sprite.Group()
-        self.maze = generator.MazeGenerator(
-            self.width,
-            self.height,
-            seed,
-            (0, 0),
-            (self.width - 1, self.height - 1),
+        self.welcome_menu = WelcomeMenu(
+            self.screen, self.screen_width, self.screen_height
         )
-        self.maze.generate((0, 0))
-        self.maze.dig()
-
-    def create_walls(self) -> None:
-        offset_y = 0
-        for row in self.maze.maze:
-            offset_x = 0
-            for col in row:
-                walls = []
-                if int(col[3]):
-                    walls += [Wall(50, 10, (0 + offset_x, 0 + offset_y))]
-                if int(col[0]):
-                    walls += [Wall(10, 50, (0 + offset_x, 0 + offset_y))]
-                if col == "1111":
-                    walls += [
-                        Wall(30, 30, (10 + offset_x, 10 + offset_y), "blue")
-                    ]
-                self.walls.add(walls)
-                self.sprites.add(walls)
-                offset_x += 40
-            offset_y += 40
-        bottom_wall = Wall(40 * self.width + 10, 10, (0, offset_y))
-        self.walls.add(bottom_wall)
-        self.sprites.add(bottom_wall)
-        right_wall = Wall(10, 40 * self.height + 10, (40 * self.width, 0))
-        self.walls.add(right_wall)
-        self.sprites.add(right_wall)
+        self.game = Game(self.screen, width, height, seed)
 
     def event(self) -> None:
-        from src.player import Direction
-
         for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if self.menu:
+                    self.menu = self.welcome_menu.event(event)
+                else:
+                    self.game.event(event)
             if event.type == pygame.QUIT:
                 self.running = False
-            if event.type == pygame.KEYDOWN:
-                player = self.sprites.sprites()[0]
-                if event.key == pygame.K_LEFT:
-                    player.disered_direction = Direction.WEST
-                if event.key == pygame.K_DOWN:
-                    player.disered_direction = Direction.SOUTH
-                if event.key == pygame.K_UP:
-                    player.disered_direction = Direction.NORTH
-                if event.key == pygame.K_RIGHT:
-                    player.disered_direction = Direction.EAST
 
     def run(self) -> None:
         pygame.init()
+
         while self.running:
+            if self.menu:
+                self.welcome_menu.show_home_menu(
+                    self.screen_width, self.screen_height
+                )
+            else:
+                self.game.update()
             self.event()
-            self.sprites.update()
-            self.screen.fill("black")
-            self.sprites.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(self.frame_rate)
         pygame.quit()

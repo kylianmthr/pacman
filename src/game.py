@@ -1,0 +1,72 @@
+import pygame
+from src.wall import Wall
+from mazegen import generator
+
+
+class Game:
+    def __init__(self, screen, width, height, seed) -> None:
+        from src.player import Player
+
+        self.width = width
+        self.height = height
+        self.screen = screen
+        self.sprites = pygame.sprite.Group()
+        player = Player(self)
+        player.rect.x = 10
+        player.rect.y = 10
+        self.sprites.add(player)
+        self.walls = pygame.sprite.Group()
+        self.maze = generator.MazeGenerator(
+            self.width,
+            self.height,
+            seed,
+            (0, 0),
+            (self.width - 1, self.height - 1),
+        )
+        self.maze.generate((0, 0))
+        self.maze.dig()
+        self.create_walls()
+
+    def create_walls(self) -> None:
+        offset_y = 0
+        for row in self.maze.maze:
+            offset_x = 0
+            for col in row:
+                walls = []
+                if int(col[3]):
+                    walls += [Wall(50, 10, (0 + offset_x, 0 + offset_y))]
+                if int(col[0]):
+                    walls += [Wall(10, 50, (0 + offset_x, 0 + offset_y))]
+                if col == "1111":
+                    walls += [
+                        Wall(30, 30, (10 + offset_x, 10 + offset_y), "blue")
+                    ]
+                self.walls.add(walls)
+                self.sprites.add(walls)
+                offset_x += 40
+            offset_y += 40
+        bottom_wall = Wall(40 * self.width + 10, 10, (0, offset_y))
+        self.walls.add(bottom_wall)
+        self.sprites.add(bottom_wall)
+        right_wall = Wall(10, 40 * self.height + 10, (40 * self.width, 0))
+        self.walls.add(right_wall)
+        self.sprites.add(right_wall)
+
+    def event(self, event) -> None:
+        from src.player import Direction
+
+        if event.type == pygame.KEYDOWN:
+            player = self.sprites.sprites()[0]
+            if event.key == pygame.K_LEFT:
+                player.disered_direction = Direction.WEST
+            if event.key == pygame.K_DOWN:
+                player.disered_direction = Direction.SOUTH
+            if event.key == pygame.K_UP:
+                player.disered_direction = Direction.NORTH
+            if event.key == pygame.K_RIGHT:
+                player.disered_direction = Direction.EAST
+
+    def update(self) -> None:
+        self.sprites.update()
+        self.screen.fill("black")
+        self.sprites.draw(self.screen)
