@@ -1,4 +1,5 @@
 import pygame
+from src.pacgum import Pacgum
 from src.wall import Wall
 from mazegen import generator
 
@@ -7,6 +8,7 @@ class Game:
     def __init__(self, screen, width, height, seed) -> None:
         from src.player import Player
 
+        self.score = 0
         self.width = width
         self.height = height
         self.screen = screen
@@ -16,6 +18,7 @@ class Game:
         player.rect.y = 10
         self.sprites.add(player)
         self.walls = pygame.sprite.Group()
+        self.pacgums = pygame.sprite.Group()
         self.maze = generator.MazeGenerator(
             self.width,
             self.height,
@@ -26,6 +29,7 @@ class Game:
         self.maze.generate((0, 0))
         self.maze.dig()
         self.create_walls()
+        self.create_pacgums()
 
     def create_walls(self) -> None:
         offset_y = 0
@@ -38,9 +42,7 @@ class Game:
                 if int(col[0]):
                     walls += [Wall(10, 50, (0 + offset_x, 0 + offset_y))]
                 if col == "1111":
-                    walls += [
-                        Wall(30, 30, (10 + offset_x, 10 + offset_y), "blue")
-                    ]
+                    walls += [Wall(30, 30, (10 + offset_x, 10 + offset_y), "blue")]
                 self.walls.add(walls)
                 self.sprites.add(walls)
                 offset_x += 40
@@ -51,6 +53,18 @@ class Game:
         right_wall = Wall(10, 40 * self.height + 10, (40 * self.width, 0))
         self.walls.add(right_wall)
         self.sprites.add(right_wall)
+
+    def create_pacgums(self) -> None:
+        offset_y = 23
+        for row in self.maze.maze:
+            offset_x = 23
+            for col in row:
+                if col != "1111":
+                    pacgum = Pacgum(2, (offset_x, offset_y))
+                    self.pacgums.add(pacgum)
+                    self.sprites.add(pacgum)
+                offset_x += 40
+            offset_y += 40
 
     def event(self, event) -> None:
         from src.player import Direction
