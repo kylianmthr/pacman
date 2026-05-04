@@ -164,12 +164,8 @@ class LeaderBoardMenu:
                 )
 
     def data_retriever(self):
-        file = Path("high_scores.json")
-        if not file.exists():
-            self.create_json()
-        else:
-            with open("high_scores.json", "r") as file:
-                self.high_scores = HighScore.model_validate_json(file.read())
+        with open("high_scores.json", "r") as file:
+            self.high_scores = HighScore.model_validate_json(file.read())
 
     def event(self, event) -> bool:
         if event.key == pygame.K_RETURN:
