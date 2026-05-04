@@ -1,12 +1,15 @@
 import pygame
+from src.pacgum import Pacgum
 from src.wall import Wall
 from mazegen import generator
+import random
 
 
 class Game:
     def __init__(self, screen, width, height, seed) -> None:
         from src.player import Player
 
+        self.score = 0
         self.width = width
         self.height = height
         self.screen = screen
@@ -16,6 +19,8 @@ class Game:
         player.rect.y = 10
         self.sprites.add(player)
         self.walls = pygame.sprite.Group()
+        self.pacgums = pygame.sprite.Group()
+        self.superpacgums = pygame.sprite.Group()
         self.maze = generator.MazeGenerator(
             self.width,
             self.height,
@@ -26,6 +31,7 @@ class Game:
         self.maze.generate((0, 0))
         self.maze.dig()
         self.create_walls()
+        self.create_pacgums()
 
     def create_walls(self) -> None:
         offset_y = 0
@@ -51,6 +57,36 @@ class Game:
         right_wall = Wall(10, 40 * self.height + 10, (40 * self.width, 0))
         self.walls.add(right_wall)
         self.sprites.add(right_wall)
+
+    def get_superpacgum(self) -> list[tuple[int, int]]:
+        cells = [
+            (row, col)
+            for row in range(len(self.maze.maze))
+            for col in range(len(self.maze.maze[0]))
+        ]
+        return random.sample(cells, 4)
+
+    def create_pacgums(self) -> None:
+        offset_y = 23
+        y = 0
+        superpacugums = self.get_superpacgum()
+        for row in self.maze.maze:
+            x = 0
+            offset_x = 23
+            for col in row:
+                if col != "1111":
+                    if (x, y) in superpacugums:
+                        pacgum = Pacgum(5, (offset_x, offset_y))
+                        self.superpacgums.add(pacgum)
+                        self.sprites.add(pacgum)
+                    else:
+                        pacgum = Pacgum(2, (offset_x, offset_y))
+                        self.pacgums.add(pacgum)
+                        self.sprites.add(pacgum)
+                x += 1
+                offset_x += 40
+            y += 1
+            offset_y += 40
 
     def event(self, event) -> None:
         from src.player import Direction

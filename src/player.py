@@ -1,6 +1,7 @@
 from enum import Enum
 import pygame
 from src.engine import Engine
+from src.game import Game
 
 
 class Direction(Enum):
@@ -11,7 +12,7 @@ class Direction(Enum):
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, engine: Engine) -> None:
+    def __init__(self, engine: Game) -> None:
         pygame.sprite.Sprite.__init__(self)
         self.sprite_sheet = pygame.image.load(
             "assets/ElementSheet.png"
@@ -73,7 +74,7 @@ class Player(pygame.sprite.Sprite):
         )
         return next_rect
 
-    def update(self):
+    def movement(self):
         if self.direction != self.disered_direction:
             if (
                 self.get_next_rect(self.disered_direction).collidelist(
@@ -110,3 +111,22 @@ class Player(pygame.sprite.Sprite):
                 if self.direction == Direction.WEST:
                     self.current_frame = 0 if self.current_frame == 2 else 2
                 self.image = self.images[self.current_frame]
+
+    def pacgum(self):
+        pacgums = self.engine.pacgums.sprites()
+        index = self.rect.collidelist(pacgums)
+        if index != -1:
+            self.engine.score += 1
+            pacgums[index].kill()
+
+    def superpacgum(self):
+        pacgums = self.engine.superpacgums.sprites()
+        index = self.rect.collidelist(pacgums)
+        if index != -1:
+            # faire un truc
+            pacgums[index].kill()
+
+    def update(self):
+        self.movement()
+        self.pacgum()
+        self.superpacgum()
