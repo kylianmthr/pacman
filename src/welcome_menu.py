@@ -1,54 +1,7 @@
 import pygame
 from pygame.math import Vector2
-
-
-class Button(pygame.sprite.Sprite):
-    def __init__(
-        self,
-        text: str,
-        color: str,
-        font: pygame.font.Font,
-        coordinates: tuple[int, int],
-    ):
-        super().__init__()
-        self.name = text
-        self.font = font
-        self.image = self.font.render(text, True, color, None)
-        self.rect = self.image.get_rect(center=coordinates)
-
-
-class Text(pygame.sprite.Sprite):
-    def __init__(
-        self,
-        text: str,
-        color: str,
-        font: pygame.font.Font,
-        coordinates: tuple[int, int],
-    ):
-        super().__init__()
-        self.name = text
-        self.color = color
-        self.font = font
-        self.image = self.font.render(text, True, color, None)
-        self.rect = self.image.get_rect(center=coordinates)
-
-
-class Picture(pygame.sprite.Sprite):
-    def __init__(
-        self,
-        name: str,
-        path: str,
-        scale_width: int,
-        scale_height: int,
-        coordinates: tuple[int, int],
-    ):
-        super().__init__()
-        self.name = name
-        self.image = pygame.image.load(path)
-        self.image = pygame.transform.smoothscale(
-            self.image, (scale_width, scale_height)
-        )
-        self.rect = self.image.get_rect(center=coordinates)
+from src.menu_sprites import Button, Picture, Text
+from src.wall import Wall
 
 
 class WelcomeMenu:
@@ -56,14 +9,17 @@ class WelcomeMenu:
         pygame.font.init()
         self.screen = screen
         self.assets = pygame.sprite.Group()
+        self.music_state = "./assets/music_on.png"
         self.screen_width = screen_width
         self.screen_height = screen_height
+        # Peut etre foutre ca dans l'engine (le prendre en parametre)
+        self.frame_color = "white"
         self.buttons = []
         self.button_idx = 0
         self.cursors_map = {}
         self.create_static_surfaces()
 
-    def show_home_menu(self, screen_width, screen_height):
+    def show(self, screen_width, screen_height):
         self.screen_height = screen_height
         self.screen_width = screen_width
         self.screen.fill("black")
@@ -73,15 +29,22 @@ class WelcomeMenu:
         for sprite in self.assets:
             sprite.kill()
 
-    def update_sprite(
+    def update_sprite_coordinate(
         self, sprite: pygame.sprite.Sprite, coordinates: tuple[int, int]
     ):
         sprite.rect = sprite.image.get_rect(center=coordinates)
 
+    def update_sprite_file_path(self, sprite: pygame.sprite.Sprite, path: str):
+        sprite.image = pygame.image.load(self.music_state)
+        sprite.image = pygame.transform.smoothscale(
+            sprite.image, (sprite.scale_width, sprite.scale_height)
+        )
+        sprite.rect = sprite.image.get_rect(center=sprite.coordinates)
+
     def update_cursor(self):
         for sprite in self.assets:
             if sprite.name == "right_selector":
-                self.update_sprite(
+                self.update_sprite_coordinate(
                     sprite,
                     (
                         self.cursors_map[self.buttons[self.button_idx].name][
@@ -91,7 +54,7 @@ class WelcomeMenu:
                     + Vector2(15, 0),
                 )
             if sprite.name == "left_selector":
-                self.update_sprite(
+                self.update_sprite_coordinate(
                     sprite,
                     (
                         self.cursors_map[self.buttons[self.button_idx].name][
@@ -136,30 +99,52 @@ class WelcomeMenu:
         self.assets.add(
             Button(
                 "START",
-                "yellow",
                 swfont,
-                (self.screen_width // 2, self.screen_height * 0.5),
+                (self.screen_width // 2, self.screen_height * 0.4),
+                1,
+                "yellow",
             )
         )
         self.assets.add(
             Button(
                 "LEADERBOARD",
-                "yellow",
                 swfont,
-                (self.screen_width // 2, self.screen_height * 0.5 + 50),
+                (self.screen_width // 2, self.screen_height * 0.4 + 50),
+                2,
+                "yellow",
             )
         )
         self.assets.add(
             Button(
-                "SETTINGS",
-                "yellow",
+                "EXIT",
                 swfont,
-                (self.screen_width // 2, self.screen_height * 0.5 + 100),
+                (self.screen_width // 2, self.screen_height * 0.4 + 100),
+                3,
+                "yellow",
+            )
+        )
+        self.assets.add(
+            Button(
+                "music",
+                self.music_state,
+                (self.screen_width * 0.3, self.screen_height * 0.9),
+                4,
+                "",
+            )
+        )
+        self.assets.add(
+            Button(
+                "color",
+                "./assets/color.png",
+                (self.screen_width * 0.7, self.screen_height * 0.9),
+                5,
+                "",
             )
         )
         self.buttons = [
             button for button in self.assets if isinstance(button, Button)
         ]
+        self.buttons.sort(key=lambda button: button.position)
         self.cursors_map = {
             button.name: {
                 "left": Vector2(button.rect.midleft),
@@ -193,13 +178,63 @@ class WelcomeMenu:
                 + Vector2(-15, 0),
             )
         )
+        self.assets.add(Wall(5, self.screen_height, (0, 0), "white", "frame"))
+        self.assets.add(Wall(self.screen_width, 5, (0, 0), "white", "frame"))
+        self.assets.add(
+            Wall(
+                self.screen_width,
+                5,
+                (0, self.screen_height - 5),
+                "white",
+                "frame",
+            )
+        )
+        self.assets.add(
+            Wall(
+                5,
+                self.screen_height,
+                (self.screen_width - 5, 0),
+                "white",
+                "frame",
+            )
+        )
 
-    def event(self, event) -> bool:
+    def change_color_frame(self) -> str:
+        frames = [frame for frame in self.assets if frame.name == "frame"]
+        colors = ["white", "blue", "red", "green", "yellow"]
+        current = (colors.index(self.frame_color) + 1) % len(colors)
+        for frame in frames:
+            self.frame_color = colors[current]
+            frame.image.fill(colors[current])
+
+    def event(self, event) -> str:
         if event.key == pygame.K_RETURN:
             if self.buttons[self.button_idx].name == "START":
-                return False
+                return "start"
+            elif self.buttons[self.button_idx].name == "LEADERBOARD":
+                return "leaderboard"
+            elif self.buttons[self.button_idx].name == "EXIT":
+                return "exit"
+            elif self.buttons[self.button_idx].name == "music":
+                if self.music_state == "./assets/music_on.png":
+                    self.music_state = "./assets/music_off.png"
+                elif self.music_state == "./assets/music_off.png":
+                    self.music_state = "./assets/music_on.png"
+                for sprite in self.assets:
+                    if sprite.name == "music":
+                        self.update_sprite_file_path(sprite, self.music_state)
+                if self.music_state == "./assets/music_on.png":
+                    return "music_on"
+                else:
+                    return "music_off"
+            elif self.buttons[self.button_idx].name == "color":
+                self.change_color_frame()
+                return self.frame_color
+            else:
+                return ""
+
         if event.key in (pygame.K_UP, pygame.K_w):
             self.item_selection(-1)
         elif event.key in (pygame.K_DOWN, pygame.K_s):
             self.item_selection(+1)
-        return True
+        return ""

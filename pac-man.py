@@ -6,5 +6,5 @@ if __name__ == "__main__":
     # print(parser.parse())
     # maze = generator.MazeGenerator(5, 5, 42, (0, 0), (4, 4))
     # maze.dig()
-    engine = Engine(20, 20, 42)
+    engine = Engine(10, 10, 42)
     engine.run()
