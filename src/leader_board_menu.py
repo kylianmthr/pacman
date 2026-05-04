@@ -88,7 +88,7 @@ class LeaderBoardMenu:
             Button(
                 "RETURN",
                 swfont,
-                (self.screen_width // 2, self.screen_height * 0.25),
+                (self.screen_width // 2, self.screen_height * 0.27),
                 1,
                 "yellow",
             )

@@ -1,6 +1,7 @@
 import pygame
 from pygame.math import Vector2
 from src.menu_sprites import Button, Picture, Text
+from src.wall import Wall
 
 
 class WelcomeMenu:
@@ -11,6 +12,7 @@ class WelcomeMenu:
         self.music_state = "./assets/music_on.png"
         self.screen_width = screen_width
         self.screen_height = screen_height
+        self.frame_color = "white"
         self.buttons = []
         self.button_idx = 0
         self.cursors_map = {}
@@ -113,7 +115,7 @@ class WelcomeMenu:
         )
         self.assets.add(
             Button(
-                "SETTINGS",
+                "EXIT",
                 swfont,
                 (self.screen_width // 2, self.screen_height * 0.4 + 100),
                 3,
@@ -175,16 +177,44 @@ class WelcomeMenu:
                 + Vector2(-15, 0),
             )
         )
+        self.assets.add(Wall(5, self.screen_height, (0, 0), "white", "frame"))
+        self.assets.add(Wall(self.screen_width, 5, (0, 0), "white", "frame"))
+        self.assets.add(
+            Wall(
+                self.screen_width,
+                5,
+                (0, self.screen_height - 5),
+                "white",
+                "frame",
+            )
+        )
+        self.assets.add(
+            Wall(
+                5,
+                self.screen_height,
+                (self.screen_width - 5, 0),
+                "white",
+                "frame",
+            )
+        )
+
+    def change_color_frame(self) -> str:
+        frames = [frame for frame in self.assets if frame.name == "frame"]
+        colors = ["white", "blue", "red", "green", "yellow"]
+        current = (colors.index(self.frame_color) + 1) % len(colors)
+        for frame in frames:
+            self.frame_color = colors[current]
+            frame.image.fill(colors[current])
 
     def event(self, event) -> bool:
         if event.key == pygame.K_RETURN:
             if self.buttons[self.button_idx].name == "START":
                 return "start"
-            if self.buttons[self.button_idx].name == "LEADERBOARD":
+            elif self.buttons[self.button_idx].name == "LEADERBOARD":
                 return "leaderboard"
-            if self.buttons[self.button_idx].name == "SETTINGS":
-                return "settings"
-            if self.buttons[self.button_idx].name == "music":
+            elif self.buttons[self.button_idx].name == "EXIT":
+                return "exit"
+            elif self.buttons[self.button_idx].name == "music":
                 if self.music_state == "./assets/music_on.png":
                     self.music_state = "./assets/music_off.png"
                 elif self.music_state == "./assets/music_off.png":
@@ -196,9 +226,11 @@ class WelcomeMenu:
                     return "music_on"
                 else:
                     return "music_off"
-            if self.buttons[self.button_idx].name == "color":
-                print("change_color")
-                return "change_color"
+            elif self.buttons[self.button_idx].name == "color":
+                self.change_color_frame()
+                return self.frame_color
+            else:
+                return ""
 
         if event.key in (pygame.K_UP, pygame.K_w):
             self.item_selection(-1)

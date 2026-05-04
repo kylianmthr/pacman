@@ -23,16 +23,26 @@ class Engine:
         # self.menu = WelcomeMenu(
         #     self.screen, self.screen_width, self.screen_height
         # )
-        self.menu = Menu(
-            self.screen, self.screen_width, self.screen_height
-        )
+        self.menu = Menu(self.screen, self.screen_width, self.screen_height)
         self.game = Game(self.screen, width, height, seed)
 
     def event(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if self.menu_active:
-                    self.menu_active = self.menu.event(event)
+                    menu_event = self.menu.event(event)
+                    if menu_event == "start":
+                        self.menu_active = False
+                    elif menu_event == "exit":
+                        self.running = False
+                    elif menu_event == "music_on":
+                        print("music on")
+                    elif menu_event == "music_off":
+                        print("music_off")
+                    elif menu_event == "":
+                        pass
+                    else:
+                        print(f"new color wall = {menu_event}")
                 else:
                     self.game.event(event)
             if event.type == pygame.QUIT:
@@ -43,9 +53,7 @@ class Engine:
 
         while self.running:
             if self.menu_active:
-                self.menu.show(
-                    self.screen_width, self.screen_height
-                )
+                self.menu.show(self.screen_width, self.screen_height)
             else:
                 self.game.update()
             self.event()

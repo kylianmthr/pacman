@@ -19,7 +19,6 @@ class Button(pygame.sprite.Sprite):
         self.position = position
         self.image = None
         self.coordinates = coordinates
-        # self.image = self.font.render(text, True, color, None)
         self.color = color
         self.scale_width = scale_width
         self.scale_height = scale_height
@@ -100,3 +99,22 @@ class Picture(pygame.sprite.Sprite):
             self.image, (scale_width, scale_height)
         )
         self.rect = self.image.get_rect(center=coordinates)
+
+
+class Rectangle(pygame.sprite.Sprite):
+    def __init__(
+        self,
+        name: str,
+        color: str,
+        left: str,
+        top: str,
+        width: int,
+        height: int,
+        coordinates: tuple[int, int],
+    ):
+        super().__init__()
+        self.name = name
+        self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        self.image.fill(color)
+        self.image = pygame.Rect((left, top, width, height))
+        self.rect = self.image.get_rect(topleft=coordinates)

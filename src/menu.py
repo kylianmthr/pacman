@@ -22,18 +22,12 @@ class Menu:
 
     def event(self, event) -> bool:
         menu_result = self.current_menu.event(event)
-
         if isinstance(self.current_menu, WelcomeMenu):
-            if menu_result == "start":
-                return False
-            # return "start"
-            elif menu_result == "leaderboard":
+            if menu_result == "leaderboard":
                 self.leaderboard_menu.update_leaderboard_surfaces()
                 self.current_menu = self.leaderboard_menu
-            elif menu_result == "music_on":
-                return "music_on"
-            elif menu_result == "music_off":
-                return "music_off"
+            else:
+                return menu_result
 
         elif isinstance(self.current_menu, LeaderBoardMenu):
             if menu_result == "return":
