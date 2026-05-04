@@ -207,7 +207,7 @@ class WelcomeMenu:
             self.frame_color = colors[current]
             frame.image.fill(colors[current])
 
-    def event(self, event) -> bool:
+    def event(self, event) -> str:
         if event.key == pygame.K_RETURN:
             if self.buttons[self.button_idx].name == "START":
                 return "start"
