@@ -190,6 +190,5 @@ class Ghost(ABC, GameSprite):
     def update(self):
         target_coordinates = self.engine.player.get_coordinates()
         if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
-            print("test")
             self.disered_direction = self.target_player(target_coordinates)
         self.movement()
