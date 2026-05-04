@@ -1,23 +1,28 @@
+from abc import ABC, abstractmethod
 from enum import Enum
+import re
 import pygame
-from src.engine import Engine
 from src.game import Game
+import math
 
 
 class Direction(Enum):
-    NORTH = 0
-    WEST = 1
-    SOUTH = 2
-    EAST = 3
+    WEST = 0
+    SOUTH = 1
+    EAST = 2
+    NORTH = 3
 
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self, engine: Game) -> None:
+class GameSprite(pygame.sprite.Sprite):
+    def __init__(
+        self, engine: Game, sprite_coordinates: tuple[int, int]
+    ) -> None:
         pygame.sprite.Sprite.__init__(self)
         self.sprite_sheet = pygame.image.load(
             "assets/ElementSheet.png"
         ).convert_alpha()
         self.images = []
+        self.x, self.y = sprite_coordinates
         self.set_animation()
         self.current_frame = 0
         self.image = self.images[self.current_frame]
@@ -45,16 +50,25 @@ class Player(pygame.sprite.Sprite):
             (width + 6, height + 6), pygame.SRCALPHA
         )
         padding_image.blit(image, (3, 3))
-        # padding_image = pygame.transform.scale(
-        #    image, (width * scale, height * scale)
-        # )
         return padding_image
 
     def set_animation(self):
         for i in range(8):
             self.images.append(
-                self.get_sprite(self.sprite_sheet, (i, 3), 24, 24, 1)
+                self.get_sprite(
+                    self.sprite_sheet,
+                    (
+                        self.x + i,
+                        self.y,
+                    ),
+                    24,
+                    24,
+                    1,
+                )
             )
+
+    def get_coordinates(self):
+        return self.rect.x // 40, self.rect.y // 40
 
     def get_next_rect(self, direction):
         next_rect = self.rect.copy()
@@ -112,6 +126,11 @@ class Player(pygame.sprite.Sprite):
                     self.current_frame = 0 if self.current_frame == 2 else 2
                 self.image = self.images[self.current_frame]
 
+
+class Player(GameSprite):
+    def __init__(self, engine: Game) -> None:
+        super().__init__(engine, (0, 3))
+
     def pacgum(self):
         pacgums = self.engine.pacgums.sprites()
         index = self.rect.collidelist(pacgums)
@@ -130,3 +149,46 @@ class Player(pygame.sprite.Sprite):
         self.movement()
         self.pacgum()
         self.superpacgum()
+
+
+class Ghost(ABC, GameSprite):
+    def __init__(
+        self, engine: Game, sprite_coordinates: tuple[int, int]
+    ) -> None:
+        super().__init__(engine, sprite_coordinates)
+        self.last_pos = self.get_coordinates()
+
+    def get_neighbors_coordinates(self, ghost_coordinates: tuple[int, int]):
+        x, y = ghost_coordinates
+        neighbors = []
+        # The walls bits are in LSB order: WEST, SOUTH, EAST, NORTH
+        if self.engine.maze.maze[y][x][0] == "0":
+            neighbors.append(((x - 1, y), Direction.WEST))
+        if self.engine.maze.maze[y][x][2] == "0":
+            neighbors.append(((x + 1, y), Direction.EAST))
+        if self.engine.maze.maze[y][x][1] == "0":
+            neighbors.append(((x, y + 1), Direction.SOUTH))
+        if self.engine.maze.maze[y][x][3] == "0":
+            neighbors.append(((x, y - 1), Direction.NORTH))
+        return neighbors
+
+    def target_player(self, player_coordinates: tuple[int, int]):
+        self.engine.maze.entry = self.get_coordinates()
+        self.engine.maze.exit = player_coordinates
+        solution = self.engine.maze.parser(self.engine.maze.solve())
+        if solution:
+            if solution[0] == "N":
+                return Direction.NORTH
+            elif solution[0] == "S":
+                return Direction.SOUTH
+            elif solution[0] == "E":
+                return Direction.EAST
+            else:
+                return Direction.WEST
+        return Direction.WEST
+
+    def update(self):
+        target_coordinates = self.engine.player.get_coordinates()
+        if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
+            self.disered_direction = self.target_player(target_coordinates)
+        self.movement()
