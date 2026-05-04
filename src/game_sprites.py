@@ -12,12 +12,15 @@ class Direction(Enum):
 
 
 class GameSprite(pygame.sprite.Sprite):
-    def __init__(self, engine: Game) -> None:
+    def __init__(
+        self, engine: Game, sprite_coordinates: tuple[int, int]
+    ) -> None:
         pygame.sprite.Sprite.__init__(self)
         self.sprite_sheet = pygame.image.load(
             "assets/ElementSheet.png"
         ).convert_alpha()
         self.images = []
+        self.x, self.y = sprite_coordinates
         self.set_animation()
         self.current_frame = 0
         self.image = self.images[self.current_frame]
@@ -50,7 +53,16 @@ class GameSprite(pygame.sprite.Sprite):
     def set_animation(self):
         for i in range(8):
             self.images.append(
-                self.get_sprite(self.sprite_sheet, (i, 3), 24, 24, 1)
+                self.get_sprite(
+                    self.sprite_sheet,
+                    (
+                        self.x + i,
+                        self.y,
+                    ),
+                    24,
+                    24,
+                    1,
+                )
             )
 
     def get_next_rect(self, direction):
@@ -112,7 +124,7 @@ class GameSprite(pygame.sprite.Sprite):
 
 class Player(GameSprite):
     def __init__(self, engine: Game) -> None:
-        super().__init__(engine)
+        super().__init__(engine, (0, 6))
 
     def pacgum(self):
         pacgums = self.engine.pacgums.sprites()
@@ -135,8 +147,10 @@ class Player(GameSprite):
 
 
 class Ghost(ABC, GameSprite):
-    def __init__(self, engine: Game) -> None:
-        super().__init__(engine)
+    def __init__(
+        self, engine: Game, sprite_coordinates: tuple[int, int]
+    ) -> None:
+        super().__init__(engine, sprite_coordinates)
 
     @abstractmethod
     def target_player(self, player_coordinates: tuple[int, int]):
