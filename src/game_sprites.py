@@ -1,14 +1,16 @@
 from abc import ABC, abstractmethod
 from enum import Enum
+import re
 import pygame
 from src.game import Game
+import math
 
 
 class Direction(Enum):
-    NORTH = 0
-    WEST = 1
-    SOUTH = 2
-    EAST = 3
+    WEST = 0
+    SOUTH = 1
+    EAST = 2
+    NORTH = 3
 
 
 class GameSprite(pygame.sprite.Sprite):
@@ -64,6 +66,9 @@ class GameSprite(pygame.sprite.Sprite):
                     1,
                 )
             )
+
+    def get_coordinates(self):
+        return self.rect.x // 40, self.rect.y // 40
 
     def get_next_rect(self, direction):
         next_rect = self.rect.copy()
@@ -124,7 +129,7 @@ class GameSprite(pygame.sprite.Sprite):
 
 class Player(GameSprite):
     def __init__(self, engine: Game) -> None:
-        super().__init__(engine, (0, 6))
+        super().__init__(engine, (0, 3))
 
     def pacgum(self):
         pacgums = self.engine.pacgums.sprites()
@@ -151,10 +156,39 @@ class Ghost(ABC, GameSprite):
         self, engine: Game, sprite_coordinates: tuple[int, int]
     ) -> None:
         super().__init__(engine, sprite_coordinates)
+        self.last_pos = self.get_coordinates()
 
-    @abstractmethod
+    def get_neighbors_coordinates(self, ghost_coordinates: tuple[int, int]):
+        x, y = ghost_coordinates
+        neighbors = []
+        # The walls bits are in LSB order: WEST, SOUTH, EAST, NORTH
+        if self.engine.maze.maze[y][x][0] == "0":
+            neighbors.append(((x - 1, y), Direction.WEST))
+        if self.engine.maze.maze[y][x][2] == "0":
+            neighbors.append(((x + 1, y), Direction.EAST))
+        if self.engine.maze.maze[y][x][1] == "0":
+            neighbors.append(((x, y + 1), Direction.SOUTH))
+        if self.engine.maze.maze[y][x][3] == "0":
+            neighbors.append(((x, y - 1), Direction.NORTH))
+        return neighbors
+
     def target_player(self, player_coordinates: tuple[int, int]):
-        pass
+        self.engine.maze.entry = self.get_coordinates()
+        self.engine.maze.exit = player_coordinates
+        solution = self.engine.maze.parser(self.engine.maze.solve())
+        if solution:
+            if solution[0] == "N":
+                return Direction.NORTH
+            elif solution[0] == "S":
+                return Direction.SOUTH
+            elif solution[0] == "E":
+                return Direction.EAST
+            else:
+                return Direction.WEST
+        return self.direction
 
     def update(self):
-        self.movement()
+        target_coordinates = self.engine.player.get_coordinates()
+        if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
+            print("test")
+            self.disered_direction = self.target_player(target_coordinates)

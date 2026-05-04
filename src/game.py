@@ -7,17 +7,21 @@ import random
 
 class Game:
     def __init__(self, screen, width, height, seed) -> None:
-        from src.game_sprites import Player
+        from src.game_sprites import Player, Ghost
 
         self.score = 0
         self.width = width
         self.height = height
         self.screen = screen
         self.sprites = pygame.sprite.Group()
-        player = Player(self)
-        player.rect.x = 10
-        player.rect.y = 10
-        self.sprites.add(player)
+        self.player = Player(self)
+        self.player.rect.x = 10
+        self.player.rect.y = 10
+        self.ghost = Ghost(self, (0, 6))
+        self.ghost.rect.x = 10  # 50 * 5
+        self.ghost.rect.y = 10  # 50 * 5
+        self.sprites.add(self.player)
+        self.sprites.add(self.ghost)
         self.walls = pygame.sprite.Group()
         self.pacgums = pygame.sprite.Group()
         self.superpacgums = pygame.sprite.Group()
