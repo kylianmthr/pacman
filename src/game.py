@@ -69,12 +69,13 @@ class Game:
     def create_pacgums(self) -> None:
         offset_y = 23
         y = 0
+        superpacugums = self.get_superpacgum()
         for row in self.maze.maze:
             x = 0
             offset_x = 23
             for col in row:
                 if col != "1111":
-                    if (x, y) in self.get_superpacgum():
+                    if (x, y) in superpacugums:
                         pacgum = Pacgum(5, (offset_x, offset_y))
                         self.superpacgums.add(pacgum)
                         self.sprites.add(pacgum)
@@ -82,7 +83,9 @@ class Game:
                         pacgum = Pacgum(2, (offset_x, offset_y))
                         self.pacgums.add(pacgum)
                         self.sprites.add(pacgum)
+                x += 1
                 offset_x += 40
+            y += 1
             offset_y += 40
 
     def event(self, event) -> None:
