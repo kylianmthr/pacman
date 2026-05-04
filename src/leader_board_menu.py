@@ -168,6 +168,7 @@ class LeaderBoardMenu:
             self.high_scores = HighScore.model_validate_json(file.read())
 
     def event(self, event) -> bool:
+        // WIP
         if event.key == pygame.K_RETURN:
             return "return"
         return "stay"
