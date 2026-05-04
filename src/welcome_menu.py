@@ -12,6 +12,7 @@ class WelcomeMenu:
         self.music_state = "./assets/music_on.png"
         self.screen_width = screen_width
         self.screen_height = screen_height
+        # Peut etre foutre ca dans l'engine (le prendre en parametre)
         self.frame_color = "white"
         self.buttons = []
         self.button_idx = 0
