@@ -1,6 +1,6 @@
+from abc import ABC, abstractmethod
 from enum import Enum
 import pygame
-from src.engine import Engine
 from src.game import Game
 
 
@@ -11,7 +11,7 @@ class Direction(Enum):
     EAST = 3
 
 
-class Player(pygame.sprite.Sprite):
+class GameSprite(pygame.sprite.Sprite):
     def __init__(self, engine: Game) -> None:
         pygame.sprite.Sprite.__init__(self)
         self.sprite_sheet = pygame.image.load(
@@ -45,9 +45,6 @@ class Player(pygame.sprite.Sprite):
             (width + 6, height + 6), pygame.SRCALPHA
         )
         padding_image.blit(image, (3, 3))
-        # padding_image = pygame.transform.scale(
-        #    image, (width * scale, height * scale)
-        # )
         return padding_image
 
     def set_animation(self):
@@ -112,6 +109,11 @@ class Player(pygame.sprite.Sprite):
                     self.current_frame = 0 if self.current_frame == 2 else 2
                 self.image = self.images[self.current_frame]
 
+
+class Player(GameSprite):
+    def __init__(self, engine: Game) -> None:
+        super().__init__(engine)
+
     def pacgum(self):
         pacgums = self.engine.pacgums.sprites()
         index = self.rect.collidelist(pacgums)
@@ -130,3 +132,15 @@ class Player(pygame.sprite.Sprite):
         self.movement()
         self.pacgum()
         self.superpacgum()
+
+
+class Ghost(ABC, GameSprite):
+    def __init__(self, engine: Game) -> None:
+        super().__init__(engine)
+
+    @abstractmethod
+    def target_player(self, player_coordinates: tuple[int, int]):
+        pass
+
+    def update(self):
+        self.movement()

@@ -7,7 +7,7 @@ import random
 
 class Game:
     def __init__(self, screen, width, height, seed) -> None:
-        from src.player import Player
+        from src.game_sprites import Player
 
         self.score = 0
         self.width = width
@@ -89,7 +89,7 @@ class Game:
             offset_y += 40
 
     def event(self, event) -> None:
-        from src.player import Direction
+        from src.game_sprites import Direction
 
         if event.type == pygame.KEYDOWN:
             player = self.sprites.sprites()[0]
