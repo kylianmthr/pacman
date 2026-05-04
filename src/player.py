@@ -14,7 +14,9 @@ class Direction(Enum):
 class Player(pygame.sprite.Sprite):
     def __init__(self, engine: Game) -> None:
         pygame.sprite.Sprite.__init__(self)
-        self.sprite_sheet = pygame.image.load("assets/ElementSheet.png").convert_alpha()
+        self.sprite_sheet = pygame.image.load(
+            "assets/ElementSheet.png"
+        ).convert_alpha()
         self.images = []
         self.set_animation()
         self.current_frame = 0
@@ -35,9 +37,13 @@ class Player(pygame.sprite.Sprite):
         scale: int = 1,
     ):
         image = pygame.Surface((width, height), pygame.SRCALPHA)
-        image.blit(sheet, (0, 0), (frame[0] * width, frame[1] * height, 60, 60))
+        image.blit(
+            sheet, (0, 0), (frame[0] * width, frame[1] * height, 60, 60)
+        )
         image = pygame.transform.scale(image, (width * scale, height * scale))
-        padding_image = pygame.Surface((width + 6, height + 6), pygame.SRCALPHA)
+        padding_image = pygame.Surface(
+            (width + 6, height + 6), pygame.SRCALPHA
+        )
         padding_image.blit(image, (3, 3))
         # padding_image = pygame.transform.scale(
         #    image, (width * scale, height * scale)
@@ -46,7 +52,9 @@ class Player(pygame.sprite.Sprite):
 
     def set_animation(self):
         for i in range(8):
-            self.images.append(self.get_sprite(self.sprite_sheet, (i, 3), 24, 24, 1))
+            self.images.append(
+                self.get_sprite(self.sprite_sheet, (i, 3), 24, 24, 1)
+            )
 
     def get_next_rect(self, direction):
         next_rect = self.rect.copy()
@@ -78,7 +86,9 @@ class Player(pygame.sprite.Sprite):
             ):
                 self.direction = self.disered_direction
         if (
-            self.get_next_rect(self.direction).collidelist(self.engine.walls.sprites())
+            self.get_next_rect(self.direction).collidelist(
+                self.engine.walls.sprites()
+            )
             == -1
         ):
             if self.direction == Direction.SOUTH:
@@ -109,6 +119,14 @@ class Player(pygame.sprite.Sprite):
             self.engine.score += 1
             pacgums[index].kill()
 
+    def superpacgum(self):
+        pacgums = self.engine.superpacgums.sprites()
+        index = self.rect.collidelist(pacgums)
+        if index != -1:
+            # faire un truc
+            pacgums[index].kill()
+
     def update(self):
         self.movement()
         self.pacgum()
+        self.superpacgum()

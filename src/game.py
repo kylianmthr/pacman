@@ -2,6 +2,7 @@ import pygame
 from src.pacgum import Pacgum
 from src.wall import Wall
 from mazegen import generator
+import random
 
 
 class Game:
@@ -19,6 +20,7 @@ class Game:
         self.sprites.add(player)
         self.walls = pygame.sprite.Group()
         self.pacgums = pygame.sprite.Group()
+        self.superpacgums = pygame.sprite.Group()
         self.maze = generator.MazeGenerator(
             self.width,
             self.height,
@@ -42,7 +44,9 @@ class Game:
                 if int(col[0]):
                     walls += [Wall(10, 50, (0 + offset_x, 0 + offset_y))]
                 if col == "1111":
-                    walls += [Wall(30, 30, (10 + offset_x, 10 + offset_y), "blue")]
+                    walls += [
+                        Wall(30, 30, (10 + offset_x, 10 + offset_y), "blue")
+                    ]
                 self.walls.add(walls)
                 self.sprites.add(walls)
                 offset_x += 40
@@ -54,15 +58,30 @@ class Game:
         self.walls.add(right_wall)
         self.sprites.add(right_wall)
 
+    def get_superpacgum(self) -> list[tuple[int, int]]:
+        cells = [
+            (row, col)
+            for row in range(len(self.maze.maze))
+            for col in range(len(self.maze.maze[0]))
+        ]
+        return random.sample(cells, 4)
+
     def create_pacgums(self) -> None:
         offset_y = 23
+        y = 0
         for row in self.maze.maze:
+            x = 0
             offset_x = 23
             for col in row:
                 if col != "1111":
-                    pacgum = Pacgum(2, (offset_x, offset_y))
-                    self.pacgums.add(pacgum)
-                    self.sprites.add(pacgum)
+                    if (x, y) in self.get_superpacgum():
+                        pacgum = Pacgum(5, (offset_x, offset_y))
+                        self.superpacgums.add(pacgum)
+                        self.sprites.add(pacgum)
+                    else:
+                        pacgum = Pacgum(2, (offset_x, offset_y))
+                        self.pacgums.add(pacgum)
+                        self.sprites.add(pacgum)
                 offset_x += 40
             offset_y += 40
 
