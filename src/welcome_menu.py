@@ -70,30 +70,15 @@ class WelcomeMenu:
         self.update_cursor()
 
     def create_static_surfaces(self):
-        pacfont = pygame.font.Font("./assets/PAC-FONT.TTF", 35)
         swfont = pygame.font.Font("./assets/Pixelmania.ttf", 15)
         self.assets.add(
-            Text(
-                "1              9",
-                "yellow",
-                pacfont,
-                (self.screen_width // 2, self.screen_height * 0.1),
-            )
-        )
-        self.assets.add(
-            Text(
-                "PACMAN",
-                "yellow",
-                pacfont,
-                (self.screen_width // 2, self.screen_height * 0.1),
-            )
-        )
-        self.assets.add(
-            Text(
-                "22222222222222",
-                "yellow",
-                pacfont,
-                (self.screen_width // 2, self.screen_height * 0.1 + 40),
+            Picture(
+                "logo",
+                "./assets/logo.png",
+                350,
+                200,
+                ((self.screen_width // 2, self.screen_height * 0.15)
+                )
             )
         )
         self.assets.add(
@@ -201,7 +186,16 @@ class WelcomeMenu:
 
     def change_color_frame(self) -> str:
         frames = [frame for frame in self.assets if frame.name == "frame"]
-        colors = ["white", "blue", "red", "green", "yellow"]
+        colors = [
+            "white",
+            "blue",
+            "red",
+            "green",
+            "yellow",
+            "purple",
+            "brown",
+            "orange",
+        ]
         current = (colors.index(self.frame_color) + 1) % len(colors)
         for frame in frames:
             self.frame_color = colors[current]
