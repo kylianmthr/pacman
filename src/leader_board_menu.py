@@ -4,11 +4,11 @@ from src.menu_sprites import Button, Picture, Text, TextFromRight, TextFromLeft
 from src.models import HighScore, Player
 from pathlib import Path
 from src.wall import Wall
-from src.high_scores import Learderboard
+from src.leaderboard import Leaderboard
 
 
 class LeaderBoardMenu:
-    def __init__(self, screen, screen_width, screen_height):
+    def __init__(self, screen, screen_width, screen_height, leaderboard):
         pygame.font.init()
         self.screen = screen
         self.assets = pygame.sprite.Group()
@@ -18,7 +18,7 @@ class LeaderBoardMenu:
         self.button_idx = 0
         self.cursors_map = {}
         self.create_static_surfaces()
-        self.leader_board = Learderboard()
+        self.leaderboard = leaderboard
 
     def show(self, screen_width, screen_height):
         self.screen_height = screen_height
@@ -132,7 +132,7 @@ class LeaderBoardMenu:
     def update_leaderboard_surfaces(self, frame_color):
         [pygame.sprite.Sprite.kill(asset) for asset in self.assets]
         self.create_static_surfaces()
-        self.leader_board.data_retriever()
+        self.leaderboard.data_retriever()
         superfunnel = pygame.font.Font("./assets/SuperFunnel.ttf", 25)
         karma_future = pygame.font.Font("./assets/KarmaFuture.ttf", 25)
         coordinate_player_name = Vector2(
@@ -141,7 +141,7 @@ class LeaderBoardMenu:
         coordinate_player_score = Vector2(
             self.screen_width * 0.95, self.screen_height * 0.3
         )
-        for player in self.leader_board.high_scores.best_players:
+        for player in self.leaderboard.high_scores.best_players:
             if player.score > 0:
                 coordinate_player_name += Vector2(0, 30)
                 coordinate_player_score += Vector2(0, 30)

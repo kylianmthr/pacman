@@ -3,7 +3,7 @@ from pydantic import TypeAdapter
 from src.models import HighScore, Player
 
 
-class Learderboard:
+class Leaderboard:
     def __init__(self):
         self.high_scores = HighScore()
         self.source_list_adapter = TypeAdapter(HighScore)

@@ -6,14 +6,14 @@ from src.welcome_menu import WelcomeMenu
 
 
 class Menu:
-    def __init__(self, screen, screen_width, screen_height):
+    def __init__(self, screen, screen_width, screen_height, leaderboard):
         self.screen = screen
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.welcome_menu = WelcomeMenu(screen, screen_width, screen_height)
         self.mute = False
         self.leaderboard_menu = LeaderBoardMenu(
-            screen, screen_width, screen_height
+            screen, screen_width, screen_height, leaderboard
         )
         self.current_menu = self.welcome_menu
 
