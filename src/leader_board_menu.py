@@ -3,20 +3,22 @@ from pygame.math import Vector2
 from src.menu_sprites import Button, Picture, Text, TextFromRight, TextFromLeft
 from src.models import HighScore, Player
 from pathlib import Path
+from src.wall import Wall
+from src.leaderboard import Leaderboard
+
 
 class LeaderBoardMenu:
-    def __init__(self, screen, screen_width, screen_height):
+    def __init__(self, screen, screen_width, screen_height, leaderboard):
         pygame.font.init()
         self.screen = screen
         self.assets = pygame.sprite.Group()
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.high_scores = []
         self.buttons = []
         self.button_idx = 0
         self.cursors_map = {}
         self.create_static_surfaces()
-        self.update_leaderboard_surfaces()
+        self.leaderboard = leaderboard
 
     def show(self, screen_width, screen_height):
         self.screen_height = screen_height
@@ -32,29 +34,6 @@ class LeaderBoardMenu:
         self, sprite: pygame.sprite.Sprite, coordinates: tuple[int, int]
     ):
         sprite.rect = sprite.image.get_rect(center=coordinates)
-
-    def update_cursor(self):
-        for sprite in self.assets:
-            if sprite.name == "right_selector":
-                self.update_sprite(
-                    sprite,
-                    (
-                        self.cursors_map[self.buttons[self.button_idx].name][
-                            "right"
-                        ]
-                    )
-                    + Vector2(15, 0),
-                )
-            if sprite.name == "left_selector":
-                self.update_sprite(
-                    sprite,
-                    (
-                        self.cursors_map[self.buttons[self.button_idx].name][
-                            "left"
-                        ]
-                    )
-                    + Vector2(-15, 0),
-                )
 
     def create_static_surfaces(self):
         pacfont = pygame.font.Font("./assets/PAC-FONT.TTF", 35)
@@ -93,7 +72,6 @@ class LeaderBoardMenu:
                 "yellow",
             )
         )
-
         self.buttons = [
             button for button in self.assets if isinstance(button, Button)
         ]
@@ -130,45 +108,78 @@ class LeaderBoardMenu:
                 + Vector2(-15, 0),
             )
         )
+        self.assets.add(Wall(5, self.screen_height, (0, 0), "white", "frame"))
+        self.assets.add(Wall(self.screen_width, 5, (0, 0), "white", "frame"))
+        self.assets.add(
+            Wall(
+                self.screen_width,
+                5,
+                (0, self.screen_height - 5),
+                "white",
+                "frame",
+            )
+        )
+        self.assets.add(
+            Wall(
+                5,
+                self.screen_height,
+                (self.screen_width - 5, 0),
+                "white",
+                "frame",
+            )
+        )
 
-    def update_leaderboard_surfaces(self):
+    def update_leaderboard_surfaces(self, frame_color):
         [pygame.sprite.Sprite.kill(asset) for asset in self.assets]
         self.create_static_surfaces()
-        self.data_retriever()
-        super_funnel = pygame.font.Font("./assets/SuperFunnel.ttf", 28)
+        self.leaderboard.data_retriever()
+        superfunnel = pygame.font.Font("./assets/SuperFunnel.ttf", 25)
+        karma_future = pygame.font.Font("./assets/KarmaFuture.ttf", 25)
         coordinate_player_name = Vector2(
-            self.screen_width * 0.15, self.screen_height * 0.3
+            self.screen_width * 0.05, self.screen_height * 0.3
         )
         coordinate_player_score = Vector2(
-            self.screen_width * 0.85, self.screen_height * 0.3
+            self.screen_width * 0.95, self.screen_height * 0.3
         )
-        for player in self.high_scores.best_players:
+        for player in self.leaderboard.high_scores.best_players:
             if player.score > 0:
                 coordinate_player_name += Vector2(0, 30)
                 coordinate_player_score += Vector2(0, 30)
                 self.assets.add(
                     TextFromLeft(
-                        f"{player.name}:",
+                        f"{player.name}",
                         "yellow",
-                        super_funnel,
+                        superfunnel,
                         coordinate_player_name,
                     )
                 )
-                self.assets.add(
-                    TextFromRight(
-                        f"{player.score}",
-                        "yellow",
-                        super_funnel,
-                        coordinate_player_score,
+                if player.score > 9999999999999:
+                    self.assets.add(
+                        TextFromRight(
+                            "Game finished",
+                            "yellow",
+                            karma_future,
+                            coordinate_player_score,
+                        )
                     )
-                )
+                else:
+                    self.assets.add(
+                        TextFromRight(
+                            f"{player.score}",
+                            "yellow",
+                            karma_future,
+                            coordinate_player_score,
+                        )
+                    )
+        frames = [frame for frame in self.assets if frame.name == "frame"]
+        for frame in frames:
+            frame.image.fill(frame_color)
 
-    def data_retriever(self):
-        with open("high_scores.json", "r") as file:
-            self.high_scores = HighScore.model_validate_json(file.read())
+    # def data_retriever(self):
+    #     with open("high_scores.json", "r") as file:
+    #         self.high_scores = HighScore.model_validate_json(file.read())
 
     def event(self, event) -> bool:
-        // WIP
         if event.key == pygame.K_RETURN:
             return "return"
-        return "stay"
+        return ""

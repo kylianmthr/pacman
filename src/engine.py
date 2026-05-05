@@ -3,6 +3,7 @@ import pygame
 from src.welcome_menu import WelcomeMenu
 from src.menu import Menu
 from src.game import Game
+from src.leaderboard import Leaderboard
 
 # from src.pacgum import Pacgum
 from src.wall import Wall
@@ -23,7 +24,13 @@ class Engine:
         # self.menu = WelcomeMenu(
         #     self.screen, self.screen_width, self.screen_height
         # )
-        self.menu = Menu(self.screen, self.screen_width, self.screen_height)
+        self.leaderboard = Leaderboard()
+        self.menu = Menu(
+            self.screen,
+            self.screen_width,
+            self.screen_height,
+            self.leaderboard,
+        )
         self.game = Game(self.screen, width, height, seed)
 
     def event(self) -> None:

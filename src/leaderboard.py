@@ -3,10 +3,11 @@ from pydantic import TypeAdapter
 from src.models import HighScore, Player
 
 
-class Learderboard:
+class Leaderboard:
     def __init__(self):
         self.high_scores = HighScore()
         self.source_list_adapter = TypeAdapter(HighScore)
+        self.data_retriever()
 
     def rank_player(self, player: Player):
         self.data_retriever()
@@ -36,3 +37,9 @@ class Learderboard:
         else:
             with open("high_scores.json", "r") as file:
                 self.high_scores = HighScore.model_validate_json(file.read())
+                self.high_scores.best_players.sort(
+                    key=lambda player: player.score, reverse=True
+                )
+                self.high_scores.best_players = self.high_scores.best_players[
+                    :10
+                ]
