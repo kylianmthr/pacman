@@ -157,6 +157,7 @@ class Ghost(ABC, GameSprite):
     ) -> None:
         super().__init__(engine, sprite_coordinates)
         self.last_pos = self.get_coordinates()
+        self.last_cycle = pygame.time.get_ticks()
 
     def get_neighbors_coordinates(self, ghost_coordinates: tuple[int, int]):
         x, y = ghost_coordinates
@@ -188,7 +189,13 @@ class Ghost(ABC, GameSprite):
         return Direction.WEST
 
     def update(self):
+        current_time = pygame.time.get_ticks()
         target_coordinates = self.engine.player.get_coordinates()
+        print((current_time - self.last_cycle))
+        if 10000 <= (current_time - self.last_cycle):
+            target_coordinates = (self.engine.height - 1, 0)
         if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
             self.disered_direction = self.target_player(target_coordinates)
+        if current_time - self.last_cycle >= 15000:
+            self.last_cycle = current_time
         self.movement()
