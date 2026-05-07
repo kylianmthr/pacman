@@ -75,16 +75,12 @@ class GameSprite(pygame.sprite.Sprite):
         next_rect.x += (
             2
             if direction == Direction.EAST
-            else -2
-            if direction == Direction.WEST
-            else 0
+            else -2 if direction == Direction.WEST else 0
         )
         next_rect.y += (
             2
             if direction == Direction.SOUTH
-            else -2
-            if direction == Direction.NORTH
-            else 0
+            else -2 if direction == Direction.NORTH else 0
         )
         return next_rect
 
@@ -433,7 +429,93 @@ class PinkGhost(Ghost):
         if len(solution) <= 4:
             self.engine.maze.exit = tuple(player_coordinates)
             target = player_coordinates
-            solution = self.engine.maze.parser(self.engine.maze.solve())
+        return self.target_player((int(target[0]), int(target[1])))
+
+    def update(self):
+        if self.evade:
+            self.evade_cycle()
+        else:
+            if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
+                target_coordinates = self.engine.player.get_coordinates()
+                self.disered_direction = self.target(target_coordinates)
+            self.movement(
+                {
+                    Direction.SOUTH: (2, 3),
+                    Direction.NORTH: (6, 7),
+                    Direction.EAST: (0, 1),
+                    Direction.WEST: (4, 5),
+                }
+            )
+
+
+class BlueGhost(Ghost):
+    def __init__(
+        self,
+        engine: Game,
+        sprite_coordinates: tuple[int, int],
+        spawn_coordinates: tuple[int, int],
+    ) -> None:
+        super().__init__(engine, sprite_coordinates)
+        self.last_pos = self.get_coordinates()
+        self.rect.x, self.rect.y = spawn_coordinates
+
+    def coordinate_is_in_front_player(
+        self, target_coordinate, player_coordinate, i
+    ):
+        self.engine.maze.entry = (
+            int(player_coordinate[0]),
+            int(player_coordinate[1]),
+        )
+        self.engine.maze.exit = (
+            int(target_coordinate[0]),
+            int(target_coordinate[1]),
+        )
+        solution = self.engine.maze.parser(self.engine.maze.solve())
+        if len(solution) != i:
+            return False
+        return True
+
+    def is_valid_coordinate(self, target_coordinate):
+        if (
+            target_coordinate[0] < 0
+            or target_coordinate[0] >= self.engine.width
+        ):
+            return False
+        if (
+            target_coordinate[1] < 0
+            or target_coordinate[1] >= self.engine.height
+        ):
+            return False
+        if target_coordinate in self.engine.maze.forty_two_cell:
+            return False
+
+        return True
+
+    def target(self, player_coordinates: tuple[int, int]):
+        red_position = self.engine.red_ghost.get_coordinates()
+        target = red_position
+        target = (
+            Vector2(player_coordinates) - Vector2(red_position)
+        ) * 2 + Vector2(red_position)
+        while True:
+            if target == player_coordinates:
+                break
+            if (
+                not self.is_valid_coordinate(
+                    target,
+                )
+                and target[1] > 0
+                and target[0] > 0
+            ):
+                target -= Vector2(1, 1)
+                continue
+            break
+        if not self.is_valid_coordinate(
+            target,
+        ):
+            target = player_coordinates
+        self.engine.maze.entry = self.get_coordinates()
+        self.engine.maze.exit = (int(target[0]), int(target[1]))
         return self.target_player((int(target[0]), int(target[1])))
 
     def update(self):
