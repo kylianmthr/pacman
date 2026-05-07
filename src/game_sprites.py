@@ -216,10 +216,21 @@ class Ghost(ABC, GameSprite):
                 )
             )
 
+    def get_last_pos(self):
+        if Direction.SOUTH == self.direction:
+            return (self.rect.x // 40, self.rect.y // 40 - 1)
+        elif Direction.NORTH == self.direction:
+            return (self.rect.x // 40, self.rect.y // 40 + 1)
+        elif Direction.EAST == self.direction:
+            return (self.rect.x // 40 - 1, self.rect.y // 40)
+        else:
+            return (self.rect.x // 40 + 1, self.rect.y // 40)
+
     def evade_movement(self):
         pos = self.get_coordinates()
+        self.last_pos = self.get_last_pos()
         if self.engine.maze.maze[pos[1]][pos[0]].count("0") == 1:
-            self.disered_direction = Direction(self.direction.value + 2 % 4)
+            self.disered_direction = Direction((self.direction.value + 2) % 4)
         if self.engine.maze.maze[pos[1]][pos[0]].count("0") == 2:
             if (
                 self.engine.maze.maze[pos[1]][pos[0]][self.direction.value]
@@ -237,15 +248,26 @@ class Ghost(ABC, GameSprite):
                         )
                     )
                 print(neighbors)
+                print(self.last_pos)
                 self.disered_direction = neighbors[0][1]
         if self.engine.maze.maze[pos[1]][pos[0]].count("0") >= 3:
             neighbors = self.get_neighbors_coordinates(pos)
+            if (
+                self.last_pos,
+                Direction((self.direction.value + 2) % 4),
+            ) in neighbors:
+                neighbors.remove(
+                    (
+                        self.last_pos,
+                        Direction((self.direction.value + 2) % 4),
+                    )
+                )
+                print(self.last_pos)
             self.disered_direction = random.choice(neighbors)[1]
 
     def evade_cycle(self):
         current_time = pygame.time.get_ticks()
         if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
-            self.last_pos = self.get_coordinates()
             self.evade_movement()
         if current_time - self.last_cycle >= 10000:
             self.evade = False
