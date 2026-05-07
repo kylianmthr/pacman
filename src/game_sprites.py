@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-import re
+import random
 import pygame
 from src.game import Game
 from pygame.math import Vector2
@@ -75,16 +75,20 @@ class GameSprite(pygame.sprite.Sprite):
         next_rect.x += (
             2
             if direction == Direction.EAST
-            else -2 if direction == Direction.WEST else 0
+            else -2
+            if direction == Direction.WEST
+            else 0
         )
         next_rect.y += (
             2
             if direction == Direction.SOUTH
-            else -2 if direction == Direction.NORTH else 0
+            else -2
+            if direction == Direction.NORTH
+            else 0
         )
         return next_rect
 
-    def movement(self):
+    def movement(self, frame_index: dict[Direction, tuple[int, int]]):
         if self.direction != self.disered_direction:
             if (
                 self.get_next_rect(self.disered_direction).collidelist(
@@ -112,14 +116,13 @@ class GameSprite(pygame.sprite.Sprite):
             current_time = pygame.time.get_ticks()
             if current_time - self.last_update >= self.frame_cooldown:
                 self.last_update = current_time
-                if self.direction == Direction.SOUTH:
-                    self.current_frame = 5 if self.current_frame == 7 else 7
-                if self.direction == Direction.NORTH:
-                    self.current_frame = 1 if self.current_frame == 3 else 3
-                if self.direction == Direction.EAST:
-                    self.current_frame = 4 if self.current_frame == 6 else 6
-                if self.direction == Direction.WEST:
-                    self.current_frame = 0 if self.current_frame == 2 else 2
+                for direction, frames in frame_index.items():
+                    if self.direction == direction:
+                        self.current_frame = (
+                            frames[0]
+                            if self.current_frame == frames[1]
+                            else frames[1]
+                        )
                 self.image = self.images[self.current_frame]
 
 
@@ -138,11 +141,19 @@ class Player(GameSprite):
         pacgums = self.engine.superpacgums.sprites()
         index = self.rect.collidelist(pacgums)
         if index != -1:
-            # faire un truc
+            for ghost in self.engine.ghosts.sprites():
+                ghost.set_evade()
             pacgums[index].kill()
 
     def update(self):
-        self.movement()
+        self.movement(
+            {
+                Direction.SOUTH: (5, 7),
+                Direction.NORTH: (1, 3),
+                Direction.EAST: (4, 6),
+                Direction.WEST: (0, 2),
+            }
+        )
         self.pacgum()
         self.superpacgum()
 
@@ -155,6 +166,7 @@ class Ghost(ABC, GameSprite):
     ) -> None:
         super().__init__(engine, sprite_coordinates)
         self.last_pos = self.get_coordinates()
+        self.evade = False
 
     def get_neighbors_coordinates(self, ghost_coordinates: tuple[int, int]):
         x, y = ghost_coordinates
@@ -168,6 +180,60 @@ class Ghost(ABC, GameSprite):
         if self.engine.maze.maze[y][x][3] == "0":
             neighbors.append(((x, y - 1), Direction.NORTH))
         return neighbors
+
+    def set_evade(self):
+        self.evade = True
+        self.last_cycle = pygame.time.get_ticks()
+        self.images = []
+        for i in range(2):
+            self.images.append(
+                self.get_sprite(
+                    self.sprite_sheet,
+                    (
+                        8 + i,
+                        4,
+                    ),
+                    24,
+                    24,
+                    1,
+                )
+            )
+
+    def set_blink(self):
+        self.images = []
+        for i in range(2):
+            self.images.append(
+                self.get_sprite(
+                    self.sprite_sheet,
+                    (
+                        7 + i,
+                        4,
+                    ),
+                    24,
+                    24,
+                    1,
+                )
+            )
+
+    def evade_cycle(self):
+        current_time = pygame.time.get_ticks()
+        self.disered_direction = random.choice(list(Direction))
+        if current_time - self.last_cycle >= 10000:
+            self.evade = False
+            self.last_cycle = current_time
+            self.images = []
+            self.set_animation()
+        if 7000 <= current_time - self.last_cycle >= 8000:
+            self.images = []
+            self.set_blink()
+        self.movement(
+            {
+                Direction.SOUTH: (0, 1),
+                Direction.NORTH: (0, 1),
+                Direction.EAST: (0, 1),
+                Direction.WEST: (0, 1),
+            }
+        )
 
     def target_player(self, player_coordinates: tuple[int, int]):
         self.engine.maze.entry = self.get_coordinates()
@@ -229,10 +295,20 @@ class RedGhost(Ghost):
         return Direction.WEST
 
     def update(self):
-        target_coordinates = self.engine.player.get_coordinates()
-        if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
-            self.disered_direction = self.target_player(target_coordinates)
-        self.movement()
+        if self.evade:
+            self.evade_cycle()
+        else:
+            target_coordinates = self.engine.player.get_coordinates()
+            if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
+                self.disered_direction = self.target_player(target_coordinates)
+            self.movement(
+                {
+                    Direction.SOUTH: (2, 3),
+                    Direction.NORTH: (6, 7),
+                    Direction.EAST: (0, 1),
+                    Direction.WEST: (4, 5),
+                }
+            )
 
 
 class PinkGhost(Ghost):
@@ -245,19 +321,6 @@ class PinkGhost(Ghost):
         super().__init__(engine, sprite_coordinates)
         self.last_pos = self.get_coordinates()
         self.rect.x, self.rect.y = spawn_coordinates
-
-    def get_neighbors_coordinates(self, ghost_coordinates: tuple[int, int]):
-        x, y = ghost_coordinates
-        neighbors = []
-        if self.engine.maze.maze[y][x][0] == "0":
-            neighbors.append(((x - 1, y), Direction.WEST))
-        if self.engine.maze.maze[y][x][2] == "0":
-            neighbors.append(((x + 1, y), Direction.EAST))
-        if self.engine.maze.maze[y][x][1] == "0":
-            neighbors.append(((x, y + 1), Direction.SOUTH))
-        if self.engine.maze.maze[y][x][3] == "0":
-            neighbors.append(((x, y - 1), Direction.NORTH))
-        return neighbors
 
     def coordinate_is_in_front_player(
         self, target_coordinate, player_coordinate, i
@@ -286,100 +349,54 @@ class PinkGhost(Ghost):
             or target_coordinate[1] >= self.engine.height
         ):
             return False
-        if target_coordinate in self.engine.forty_two_coordinate:
+        if target_coordinate in self.engine.maze.forty_two_cell:
             return False
 
         return True
 
-    def target_player(self, player_coordinates: tuple[int, int]):
+    def target(self, player_coordinates: tuple[int, int]):
         i = 4
-        if self.engine.player.direction == Direction.WEST:
-            while True:
-                target = Vector2(player_coordinates) - Vector2((i, 0))
-                if i == 0:
-                    break
-                if not self.is_valid_coordinate(
-                    target,
-                ):
-                    i -= 1
-                    continue
-                if not self.coordinate_is_in_front_player(
-                    target, player_coordinates, i
-                ):
-                    i -= 1
-                else:
-                    break
-
-        if self.engine.player.direction == Direction.SOUTH:
-            while True:
-                target = Vector2(player_coordinates) + Vector2((0, i))
-                if i == 0:
-                    break
-                if not self.is_valid_coordinate(
-                    target,
-                ):
-                    i -= 1
-                    continue
-                if not self.coordinate_is_in_front_player(
-                    target, player_coordinates, i
-                ):
-                    i -= 1
-                else:
-                    break
-
-        if self.engine.player.direction == Direction.EAST:
-            while True:
-                target = Vector2(player_coordinates) + Vector2((i, 0))
-                if i == 0:
-                    break
-                if not self.is_valid_coordinate(
-                    target,
-                ):
-                    i -= 1
-                    continue
-                if not self.coordinate_is_in_front_player(
-                    target, player_coordinates, i
-                ):
-                    i -= 1
-                else:
-                    break
-
-        if self.engine.player.direction == Direction.NORTH:
-            while True:
-                target = Vector2(player_coordinates) - Vector2((0, i))
-                if i == 0:
-                    break
-                if not self.is_valid_coordinate(
-                    target,
-                ):
-                    i -= 1
-                    continue
-                if not self.coordinate_is_in_front_player(
-                    target, player_coordinates, i
-                ):
-                    i -= 1
-                else:
-                    break
+        while True:
+            coords = [(-i, 0), (0, i), (i, 0), (0, -i)]
+            target = Vector2(player_coordinates) - Vector2(
+                coords[self.engine.player.direction.value]
+            )
+            if i == 0:
+                break
+            if not self.is_valid_coordinate(
+                target,
+            ):
+                i -= 1
+                continue
+            if not self.coordinate_is_in_front_player(
+                target, player_coordinates, i
+            ):
+                i -= 1
+            else:
+                break
 
         self.engine.maze.entry = self.get_coordinates()
         self.engine.maze.exit = (int(target[0]), int(target[1]))
+        self.target_player((int(target[0]), int(target[1])))
         solution = self.engine.maze.parser(self.engine.maze.solve())
         if len(solution) <= 4:
             self.engine.maze.exit = tuple(player_coordinates)
+            target = player_coordinates
             solution = self.engine.maze.parser(self.engine.maze.solve())
-        if solution:
-            if solution[0] == "N":
-                return Direction.NORTH
-            elif solution[0] == "S":
-                return Direction.SOUTH
-            elif solution[0] == "E":
-                return Direction.EAST
-            else:
-                return Direction.WEST
-        return Direction.WEST
+        return self.target_player((int(target[0]), int(target[1])))
 
     def update(self):
-        if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
-            target_coordinates = self.engine.player.get_coordinates()
-            self.disered_direction = self.target_player(target_coordinates)
-        self.movement()
+        if self.evade:
+            self.evade_cycle()
+        else:
+            if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
+                target_coordinates = self.engine.player.get_coordinates()
+                self.disered_direction = self.target(target_coordinates)
+            self.movement(
+                {
+                    Direction.SOUTH: (2, 3),
+                    Direction.NORTH: (6, 7),
+                    Direction.EAST: (0, 1),
+                    Direction.WEST: (4, 5),
+                }
+            )
