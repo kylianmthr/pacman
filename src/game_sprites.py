@@ -166,6 +166,7 @@ class Ghost(ABC, GameSprite):
     ) -> None:
         super().__init__(engine, sprite_coordinates)
         self.last_pos = self.get_coordinates()
+        self.last_cycle = pygame.time.get_ticks()
         self.evade = False
 
     def get_neighbors_coordinates(self, ghost_coordinates: tuple[int, int]):
@@ -215,9 +216,37 @@ class Ghost(ABC, GameSprite):
                 )
             )
 
+    def evade_movement(self):
+        pos = self.get_coordinates()
+        if self.engine.maze.maze[pos[1]][pos[0]].count("0") == 1:
+            self.disered_direction = Direction(self.direction.value + 2 % 4)
+        if self.engine.maze.maze[pos[1]][pos[0]].count("0") == 2:
+            if (
+                self.engine.maze.maze[pos[1]][pos[0]][self.direction.value]
+                == "1"
+            ):
+                neighbors = self.get_neighbors_coordinates(pos)
+                if (
+                    self.last_pos,
+                    Direction((self.direction.value + 2) % 4),
+                ) in neighbors:
+                    neighbors.remove(
+                        (
+                            self.last_pos,
+                            Direction((self.direction.value + 2) % 4),
+                        )
+                    )
+                print(neighbors)
+                self.disered_direction = neighbors[0][1]
+        if self.engine.maze.maze[pos[1]][pos[0]].count("0") >= 3:
+            neighbors = self.get_neighbors_coordinates(pos)
+            self.disered_direction = random.choice(neighbors)[1]
+
     def evade_cycle(self):
         current_time = pygame.time.get_ticks()
-        self.disered_direction = random.choice(list(Direction))
+        if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
+            self.last_pos = self.get_coordinates()
+            self.evade_movement()
         if current_time - self.last_cycle >= 10000:
             self.evade = False
             self.last_cycle = current_time
