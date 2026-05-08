@@ -160,8 +160,8 @@ class Player(GameSprite):
                 ghost.evade = False
                 ghost.set_eaten()
             else:
-                pass
-                # le game over
+                if not ghost.eaten:
+                    print("test")
 
     def update(self):
         self.movement(
@@ -286,8 +286,6 @@ class Ghost(ABC, GameSprite):
                             Direction((self.direction.value + 2) % 4),
                         )
                     )
-                print(neighbors)
-                print(self.last_pos)
                 self.disered_direction = neighbors[0][1]
         if self.engine.maze.maze[pos[1]][pos[0]].count("0") >= 3:
             neighbors = self.get_neighbors_coordinates(pos)
@@ -301,7 +299,6 @@ class Ghost(ABC, GameSprite):
                         Direction((self.direction.value + 2) % 4),
                     )
                 )
-                print(self.last_pos)
             self.disered_direction = random.choice(neighbors)[1]
 
     def evade_cycle(self):
