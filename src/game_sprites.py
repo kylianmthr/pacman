@@ -71,28 +71,30 @@ class GameSprite(pygame.sprite.Sprite):
     def get_coordinates(self):
         return self.rect.x // 40, self.rect.y // 40
 
-    def get_next_rect(self, direction):
+    def get_next_rect(self, direction, speed):
         next_rect = self.rect.copy()
         next_rect.x += (
-            2
+            speed
             if direction == Direction.EAST
-            else -2
+            else -speed
             if direction == Direction.WEST
             else 0
         )
         next_rect.y += (
-            2
+            speed
             if direction == Direction.SOUTH
-            else -2
+            else -speed
             if direction == Direction.NORTH
             else 0
         )
         return next_rect
 
-    def movement(self, frame_index: dict[Direction, tuple[int, int]]):
+    def movement(
+        self, frame_index: dict[Direction, tuple[int, int]], speed: int = 2
+    ):
         if self.direction != self.disered_direction:
             if (
-                self.get_next_rect(self.disered_direction).collidelist(
+                self.get_next_rect(self.disered_direction, speed).collidelist(
                     self.engine.walls.sprites()
                 )
                 == -1
@@ -101,19 +103,19 @@ class GameSprite(pygame.sprite.Sprite):
             ):
                 self.direction = self.disered_direction
         if (
-            self.get_next_rect(self.direction).collidelist(
+            self.get_next_rect(self.direction, speed).collidelist(
                 self.engine.walls.sprites()
             )
             == -1
         ):
             if self.direction == Direction.SOUTH:
-                self.rect.y += 2
+                self.rect.y += speed
             if self.direction == Direction.NORTH:
-                self.rect.y -= 2
+                self.rect.y -= speed
             if self.direction == Direction.EAST:
-                self.rect.x += 2
+                self.rect.x += speed
             if self.direction == Direction.WEST:
-                self.rect.x -= 2
+                self.rect.x -= speed
             current_time = pygame.time.get_ticks()
             if current_time - self.last_update >= self.frame_cooldown:
                 self.last_update = current_time
@@ -146,6 +148,21 @@ class Player(GameSprite):
                 ghost.set_evade()
             pacgums[index].kill()
 
+    def ghosts(self):
+        ghosts = self.engine.ghosts.sprites()
+        index = self.rect.collidelist(ghosts)
+        if index != -1:
+            ghost = ghosts[index]
+            if ghost.evade:
+                ghost.rect.x = round(ghost.rect.x / 5) * 5
+                ghost.rect.y = round(ghost.rect.y / 5) * 5
+                ghost.eaten = True
+                ghost.evade = False
+                ghost.set_eaten()
+            else:
+                pass
+                # le game over
+
     def update(self):
         self.movement(
             {
@@ -157,6 +174,7 @@ class Player(GameSprite):
         )
         self.pacgum()
         self.superpacgum()
+        self.ghosts()
 
 
 class Ghost(ABC, GameSprite):
@@ -172,6 +190,7 @@ class Ghost(ABC, GameSprite):
         self.evade = False
         self.spawn = spawn_coordinates
         self.rect.x, self.rect.y = spawn_coordinates
+        self.eaten = False
 
     def get_neighbors_coordinates(self, ghost_coordinates: tuple[int, int]):
         x, y = ghost_coordinates
@@ -213,6 +232,22 @@ class Ghost(ABC, GameSprite):
                     (
                         7 + i,
                         4,
+                    ),
+                    24,
+                    24,
+                    1,
+                )
+            )
+
+    def set_eaten(self):
+        self.images = []
+        for i in range(8):
+            self.images.append(
+                self.get_sprite(
+                    self.sprite_sheet,
+                    (
+                        8 + i,
+                        9,
                     ),
                     24,
                     24,
@@ -304,6 +339,41 @@ class Ghost(ABC, GameSprite):
         if current_time - self.last_cycle >= 15000:
             self.last_cycle = current_time
 
+    def eaten_cycle(self):
+        current_time = pygame.time.get_ticks()
+        if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
+            if self.get_coordinates() == (
+                self.spawn[0] // 40,
+                self.spawn[1] // 40,
+            ):
+                self.last_cycle = current_time
+                self.images = []
+                self.set_animation()
+                self.eaten = False
+        if self.eaten:
+            if (
+                float(self.get_coordinates()[0]),
+                float(self.get_coordinates()[1]),
+            ) != (
+                self.spawn[0] / 40,
+                self.spawn[1] / 40,
+            ):
+                self.disered_direction = self.target_player(
+                    (
+                        self.spawn[0] // 40,
+                        self.spawn[1] // 40,
+                    )
+                )
+                self.movement(
+                    {
+                        Direction.SOUTH: (2, 3),
+                        Direction.NORTH: (6, 7),
+                        Direction.EAST: (0, 1),
+                        Direction.WEST: (4, 5),
+                    },
+                    5,
+                )
+
     def target_player(self, player_coordinates: tuple[int, int]):
         self.engine.maze.entry = self.get_coordinates()
         self.engine.maze.exit = player_coordinates
@@ -350,6 +420,8 @@ class RedGhost(Ghost):
     def update(self):
         if self.evade:
             self.evade_cycle()
+        elif self.eaten:
+            self.eaten_cycle()
         else:
             target_coordinates = self.engine.player.get_coordinates()
             if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
@@ -440,6 +512,8 @@ class PinkGhost(Ghost):
     def update(self):
         if self.evade:
             self.evade_cycle()
+        elif self.eaten:
+            self.eaten_cycle()
         else:
             if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
                 target_coordinates = self.engine.player.get_coordinates()
@@ -527,6 +601,8 @@ class BlueGhost(Ghost):
     def update(self):
         if self.evade:
             self.evade_cycle()
+        elif self.eaten:
+            self.eaten_cycle()
         else:
             if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
                 target_coordinates = self.engine.player.get_coordinates()
@@ -602,6 +678,8 @@ class OrangeGhost(Ghost):
     def update(self):
         if self.evade:
             self.evade_cycle()
+        elif self.eaten:
+            self.eaten_cycle()
         else:
             if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
                 self.target(self.engine.player.get_coordinates())
