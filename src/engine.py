@@ -1,10 +1,28 @@
 import pygame
+from pygame import mixer
 import os
 
 from src.models import LevelType
 from src.menu import Menu
 from src.game import Game
 from src.leaderboard import Leaderboard
+
+
+class Music:
+    def __init__(self, start_song, game_song):
+        mixer.init()
+        self.start_song = start_song
+        self.game_song = game_song
+
+    def launch_start_song(self):
+        mixer.music.load(self.start_song)
+        mixer.music.set_volume(0.7)
+        mixer.music.play()
+
+    def launch_game_song(self):
+        mixer.music.load(self.game_song)
+        mixer.music.set_volume(0.7)
+        mixer.music.play(loops=-1)
 
 
 class Engine:
@@ -16,6 +34,8 @@ class Engine:
         self.levels = levels
         self.seed = seed
         self.running = True
+        self.music_active = True
+
         self.frame_rate = 60
         self.screen_width = levels[self.level].width * 40 + 10
         self.screen_height = levels[self.level].height * 40 + 40
@@ -37,6 +57,16 @@ class Engine:
             self.levels[self.level].height,
             seed,
         )
+        self.music = Music(
+            "./assets/pacman_beginning.mp3", "./assets/eat_dot.wav"
+        )
+        self.music.launch_start_song()
+
+    def change_wall_color(self, color):
+        for wall in self.game.walls:
+            wall.color = color
+            wall.image.fill(color)
+
 
     def next_level(self) -> None:
         self.level += 1
@@ -55,21 +85,27 @@ class Engine:
         self.loading = False
 
     def event(self) -> None:
+
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if self.menu_active:
                     menu_event = self.menu.event(event)
                     if menu_event == "start":
+                        if self.music_active:
+                            self.music.launch_game_song()
                         self.menu_active = False
                     elif menu_event == "exit":
                         self.running = False
                     elif menu_event == "music_on":
-                        print("music on")
+                        self.music_active = True
+                        self.music.launch_start_song()
                     elif menu_event == "music_off":
-                        print("music_off")
+                        self.music_active = False
+                        mixer.music.stop()
                     elif menu_event == "":
                         pass
                     else:
+                        self.change_wall_color(menu_event)
                         print(f"new color wall = {menu_event}")
                 else:
                     self.game.event(event)
