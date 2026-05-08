@@ -6,7 +6,7 @@ import random
 
 
 class Game:
-    def __init__(self, screen, width, height, seed) -> None:
+    def __init__(self, engine, screen, width, height, seed) -> None:
         from src.game_sprites import (
             Player,
             PinkGhost,
@@ -15,6 +15,7 @@ class Game:
             OrangeGhost,
         )
 
+        self.engine = engine
         self.score = 0
         self.width = width
         self.height = height
@@ -133,3 +134,6 @@ class Game:
         self.sprites.update()
         self.screen.fill("black")
         self.sprites.draw(self.screen)
+        if len(self.pacgums.sprites()) == 0 and not self.engine.loading:
+            self.engine.loading = True
+            self.engine.next_level()
