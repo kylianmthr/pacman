@@ -292,38 +292,15 @@ class Ghost(ABC, GameSprite):
 
     def scatter_cycle(self):
         current_time = pygame.time.get_ticks()
-        pos = self.get_coordinates()
-        self.last_pos = self.get_last_pos()
         if current_time - self.last_cycle >= 10000:
-            if self.engine.maze.maze[pos[1]][pos[0]].count("0") == 1:
-                self.disered_direction = Direction(
-                    (self.direction.value + 2) % 4
-                )
-            if self.engine.maze.maze[pos[1]][pos[0]].count("0") == 2:
-                if (
-                    self.engine.maze.maze[pos[1]][pos[0]][self.direction.value]
-                    == "1"
-                ):
-                    neighbors = self.get_neighbors_coordinates(pos)
-                    if (
-                        self.last_pos,
-                        Direction((self.direction.value + 2) % 4),
-                    ) in neighbors:
-                        neighbors.remove(
-                            (
-                                self.last_pos,
-                                Direction((self.direction.value + 2) % 4),
-                            )
-                        )
-                    self.disered_direction = neighbors[0][1]
-            if self.engine.maze.maze[pos[1]][pos[0]].count("0") >= 3:
-                self.disered_direction = self.target_player(
-                    (self.spawn[0] // 40, self.spawn[1] // 40)
-                )
-
             self.disered_direction = self.target_player(
                 (self.spawn[0] // 40, self.spawn[1] // 40)
             )
+        if self.get_coordinates() == (
+            self.spawn[0] // 40,
+            self.spawn[1] // 40,
+        ):
+            self.last_cycle = current_time
         if current_time - self.last_cycle >= 15000:
             self.last_cycle = current_time
 
