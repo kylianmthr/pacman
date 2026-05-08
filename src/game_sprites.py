@@ -76,16 +76,12 @@ class GameSprite(pygame.sprite.Sprite):
         next_rect.x += (
             2
             if direction == Direction.EAST
-            else -2
-            if direction == Direction.WEST
-            else 0
+            else -2 if direction == Direction.WEST else 0
         )
         next_rect.y += (
             2
             if direction == Direction.SOUTH
-            else -2
-            if direction == Direction.NORTH
-            else 0
+            else -2 if direction == Direction.NORTH else 0
         )
         return next_rect
 
@@ -130,11 +126,15 @@ class GameSprite(pygame.sprite.Sprite):
 class Player(GameSprite):
     def __init__(self, engine: Game) -> None:
         super().__init__(engine, (0, 3))
+        self.last_pos = self.get_coordinates()
 
     def pacgum(self):
+
         pacgums = self.engine.pacgums.sprites()
         index = self.rect.collidelist(pacgums)
         if index != -1:
+            if self.engine.music_active:
+                self.engine.music.launch_game_song()
             self.engine.score += 1
             pacgums[index].kill()
 
@@ -157,6 +157,15 @@ class Player(GameSprite):
         )
         self.pacgum()
         self.superpacgum()
+
+    def music_on(self):
+        print(self.last_pos, (self.rect.x, self.rect.y))
+        if self.last_pos == (self.rect.x, self.rect.y):
+            self.last_pos = (self.rect.x, self.rect.y)
+            return False
+        else:
+            self.last_pos = (self.rect.x, self.rect.y)
+            return True
 
 
 class Ghost(ABC, GameSprite):

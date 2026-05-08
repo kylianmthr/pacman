@@ -50,6 +50,7 @@ class Game:
         self.ghosts.add(self.blue_ghost)
         self.ghosts.add(self.orange_ghost)
         self.sprites.add(self.player)
+        self.sprites.add(self.blue_ghost)
         self.sprites.add(self.red_ghost)
         self.sprites.add(self.pink_ghost)
         self.sprites.add(self.blue_ghost)
