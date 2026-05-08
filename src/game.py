@@ -7,7 +7,13 @@ import random
 
 class Game:
     def __init__(self, screen, width, height, seed) -> None:
-        from src.game_sprites import Player, PinkGhost, RedGhost
+        from src.game_sprites import (
+            Player,
+            PinkGhost,
+            RedGhost,
+            BlueGhost,
+            OrangeGhost,
+        )
 
         self.score = 0
         self.width = width
@@ -28,12 +34,26 @@ class Game:
         self.maze.generate((0, 0))
         self.maze.dig()
         self.red_ghost = RedGhost(self, (0, 6), (10, 10))
-        self.pink_ghost = PinkGhost(self, (0, 8), (10, 10))
+        self.pink_ghost = PinkGhost(
+            self, (0, 8), ((self.width - 1) * 40 + 10, 10)
+        )
+        self.blue_ghost = BlueGhost(
+            self,
+            (8, 8),
+            ((self.width - 1) * 40 + 10, (self.height - 1) * 40 + 10),
+        )
+        self.orange_ghost = OrangeGhost(
+            self, (0, 9), (10, (self.height - 1) * 40 + 10)
+        )
         self.ghosts.add(self.red_ghost)
         self.ghosts.add(self.pink_ghost)
+        self.ghosts.add(self.blue_ghost)
+        self.ghosts.add(self.orange_ghost)
         self.sprites.add(self.player)
         self.sprites.add(self.red_ghost)
         self.sprites.add(self.pink_ghost)
+        self.sprites.add(self.blue_ghost)
+        self.sprites.add(self.orange_ghost)
         self.walls = pygame.sprite.Group()
         self.pacgums = pygame.sprite.Group()
         self.superpacgums = pygame.sprite.Group()
