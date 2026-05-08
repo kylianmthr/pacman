@@ -1,4 +1,5 @@
 import pygame
+import os
 
 from src.models import LevelType
 from src.menu import Menu
@@ -8,6 +9,7 @@ from src.leaderboard import Leaderboard
 
 class Engine:
     def __init__(self, levels: list[LevelType], seed: int) -> None:
+        os.environ["SDL_VIDEO_CENTERED"] = "1"
         self.menu_active = True
         self.level = 0
         self.loading = False
