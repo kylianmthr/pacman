@@ -14,9 +14,10 @@ class Game:
             BlueGhost,
             OrangeGhost,
         )
+        from src.hud import HUD
 
         self.engine = engine
-        self.score = 0
+        self.hud = HUD(self, self.engine)
         self.width = width
         self.height = height
         self.screen = screen
@@ -51,13 +52,14 @@ class Game:
         self.ghosts.add(self.blue_ghost)
         self.ghosts.add(self.orange_ghost)
         self.sprites.add(self.player)
+        self.walls = pygame.sprite.Group()
+        self.pacgums = pygame.sprite.Group()
+        self.superpacgums = pygame.sprite.Group()
         self.sprites.add(self.red_ghost)
         self.sprites.add(self.pink_ghost)
         self.sprites.add(self.blue_ghost)
         self.sprites.add(self.orange_ghost)
-        self.walls = pygame.sprite.Group()
-        self.pacgums = pygame.sprite.Group()
-        self.superpacgums = pygame.sprite.Group()
+        self.sprites.add(self.hud.score)
         self.create_walls()
         self.create_pacgums()
 

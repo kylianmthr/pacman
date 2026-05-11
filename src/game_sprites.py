@@ -138,14 +138,12 @@ class Player(GameSprite):
         self.last_pos = self.get_coordinates()
 
     def pacgum(self):
-
         pacgums = self.game.pacgums.sprites()
         index = self.rect.collidelist(pacgums)
         if index != -1:
-            print("pacgum")
             if self.engine.music_active:
                 self.engine.music.launch_game_song()
-            self.game.score += 1
+            self.engine.score += 1
             pacgums[index].kill()
 
     def superpacgum(self):

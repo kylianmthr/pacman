@@ -35,7 +35,7 @@ class Engine:
         self.seed = seed
         self.running = True
         self.music_active = True
-
+        self.score = 0
         self.frame_rate = 60
         self.screen_width = levels[self.level].width * 40 + 10
         self.screen_height = levels[self.level].height * 40 + 40
