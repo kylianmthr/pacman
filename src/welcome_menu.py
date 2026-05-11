@@ -226,6 +226,7 @@ class WelcomeMenu:
     def event(self, event) -> str:
         if event.key == pygame.K_RETURN:
             if self.buttons[self.button_idx].name == "START":
+                print("ok")
                 self.engine.menu_active = False
                 if self.engine.music_active:
                     self.engine.music.ghost_sound_effect()

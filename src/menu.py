@@ -6,8 +6,10 @@ from src.game_over_menu import EndOfGameMenu
 class Menu:
     def __init__(self, engine):
         self.engine = engine
-        self.game_over_menu = EndOfGameMenu(self.engine, "game_over")
-        self.game_finished_menu = EndOfGameMenu(self.engine, "game_finished")
+        self.game_over_menu = EndOfGameMenu(self.engine, "game_over", self)
+        self.game_finished_menu = EndOfGameMenu(
+            self.engine, "game_finished", self
+        )
         self.welcome_menu = WelcomeMenu(self.engine, self)
         self.mute = False
         self.leaderboard_menu = LeaderBoardMenu(self.engine, self)

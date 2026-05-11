@@ -44,6 +44,7 @@ class Text(pygame.sprite.Sprite):
         coordinates: tuple[int, int],
     ):
         super().__init__()
+        self.coordinates = coordinates
         self.name = text
         self.color = color
         self.font = font

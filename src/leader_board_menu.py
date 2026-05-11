@@ -140,8 +140,8 @@ class LeaderBoardMenu:
         [pygame.sprite.Sprite.kill(asset) for asset in self.assets]
         self.create_static_surfaces()
         self.engine.leaderboard.data_retriever()
-        superfunnel = pygame.font.Font("./assets/SuperFunnel.ttf", 25)
-        karma_future = pygame.font.Font("./assets/KarmaFuture.ttf", 25)
+        superfunnel = pygame.font.Font("./assets/SuperFunnel.ttf", 20)
+        karma_future = pygame.font.Font("./assets/KarmaFuture.ttf", 20)
         coordinate_player_name = Vector2(
             self.engine.screen_width * 0.05, self.engine.screen_height * 0.3
         )
@@ -150,8 +150,8 @@ class LeaderBoardMenu:
         )
         for player in self.engine.leaderboard.high_scores.best_players:
             if player.score > 0:
-                coordinate_player_name += Vector2(0, 30)
-                coordinate_player_score += Vector2(0, 30)
+                coordinate_player_name += Vector2(0, 28)
+                coordinate_player_score += Vector2(0, 28)
                 self.assets.add(
                     TextFromLeft(
                         f"{player.name}",

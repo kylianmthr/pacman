@@ -179,5 +179,6 @@ class Game:
             self.engine.loading = True
             self.engine.next_level()
         if self.lives < 0 or self.timer.is_expired():
+            self.engine.menu_active = True
             self.engine.menu.switch_menu("game_over_menu")
             mixer.music.stop()
