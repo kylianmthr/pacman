@@ -133,7 +133,6 @@ class Player(GameSprite):
         self.last_pos = self.get_coordinates()
 
     def pacgum(self):
-
         pacgums = self.game.pacgums.sprites()
         index = self.rect.collidelist(pacgums)
         if index != -1:
