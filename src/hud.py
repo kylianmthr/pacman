@@ -16,6 +16,13 @@ class HUD:
             self.arcade_font,
             (20, self.engine.screen_height - 15),
         )
+        self.lives = self.Lives(
+            self,
+            str(self.game.lives),
+            "white",
+            self.arcade_font,
+            (90, self.engine.screen_height - 15),
+        )
 
     class Score(Text):
         def __init__(
@@ -31,4 +38,20 @@ class HUD:
 
         def update(self):
             self.text = str(self.hud.engine.score)
+            self.image = self.font.render(self.text, True, self.color)
+
+    class Lives(Text):
+        def __init__(
+            self,
+            hud: "HUD",
+            text: str,
+            color: str,
+            font: pygame.font.Font,
+            coordinates: tuple[int, int],
+        ):
+            super().__init__(text, color, font, coordinates)
+            self.hud = hud
+
+        def update(self):
+            self.text = str(self.hud.game.lives)
             self.image = self.font.render(self.text, True, self.color)

@@ -168,7 +168,7 @@ class Player(GameSprite):
                 ghost.set_eaten()
             else:
                 if not ghost.eaten:
-                    pass
+                    self.game.respawn()
 
     def update(self):
         self.movement(
