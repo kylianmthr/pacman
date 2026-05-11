@@ -9,7 +9,7 @@ if __name__ == "__main__":
         try:
             # maze = generator.MazeGenerator(5, 5, 42, (0, 0), (4, 4))
             # maze.dig()
-            engine = Engine(data.level, data.seed)
+            engine = Engine(data)
             engine.run()
         except Exception as e:
             print(f"Error running the game: {e}")

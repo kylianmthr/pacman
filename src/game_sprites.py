@@ -170,7 +170,8 @@ class Player(GameSprite):
                 self.engine.score += self.game.points_per_ghost
             else:
                 if not ghost.eaten:
-                    self.game.respawn()
+                    if not self.game.cheats.invisibility:
+                        self.game.respawn()
 
     def update(self):
         self.movement(
@@ -442,7 +443,8 @@ class RedGhost(Ghost):
                     Direction.NORTH: (6, 7),
                     Direction.EAST: (0, 1),
                     Direction.WEST: (4, 5),
-                }
+                },
+                1,
             )
 
 
@@ -531,7 +533,8 @@ class PinkGhost(Ghost):
                     Direction.NORTH: (6, 7),
                     Direction.EAST: (0, 1),
                     Direction.WEST: (4, 5),
-                }
+                },
+                1,
             )
 
 
@@ -622,7 +625,8 @@ class BlueGhost(Ghost):
                     Direction.NORTH: (6, 7),
                     Direction.EAST: (0, 1),
                     Direction.WEST: (4, 5),
-                }
+                },
+                1,
             )
 
 
@@ -703,5 +707,6 @@ class OrangeGhost(Ghost):
                     Direction.NORTH: (6, 7),
                     Direction.EAST: (0, 1),
                     Direction.WEST: (4, 5),
-                }
+                },
+                1,
             )
