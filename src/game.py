@@ -7,13 +7,24 @@ import random
 
 
 class Game:
-    def __init__(self, engine, screen, width, height, seed) -> None:
+    def __init__(
+        self,
+        engine,
+        screen,
+        width,
+        height,
+        seed,
+        points_per_pacgum,
+        points_per_super_pacgum,
+        points_per_ghost,
+    ) -> None:
         from src.game_sprites import (
             Player,
             PinkGhost,
             RedGhost,
             BlueGhost,
             OrangeGhost,
+            Ghost,
         )
         from src.hud import HUD
 
@@ -38,35 +49,31 @@ class Game:
         )
         self.maze.generate((0, 0))
         self.maze.dig()
-        self.red_ghost = RedGhost(self, (0, 6), (10, 10))
-        self.pink_ghost = PinkGhost(
-            self, (0, 8), ((self.width - 1) * 40 + 10, 10)
-        )
-        self.blue_ghost = BlueGhost(
-            self,
-            (8, 8),
-            ((self.width - 1) * 40 + 10, (self.height - 1) * 40 + 10),
-        )
-        self.orange_ghost = OrangeGhost(
-            self, (0, 9), (10, (self.height - 1) * 40 + 10)
-        )
-        self.ghosts.add(self.red_ghost)
-        self.ghosts.add(self.pink_ghost)
-        self.ghosts.add(self.blue_ghost)
-        self.ghosts.add(self.orange_ghost)
+        ghosts: list[Ghost] = [
+            RedGhost(self, (0, 6), (10, 10)),
+            PinkGhost(self, (0, 8), ((self.width - 1) * 40 + 10, 10)),
+            BlueGhost(
+                self,
+                (8, 8),
+                ((self.width - 1) * 40 + 10, (self.height - 1) * 40 + 10),
+            ),
+            OrangeGhost(self, (0, 9), (10, (self.height - 1) * 40 + 10)),
+        ]
         self.sprites.add(self.player)
         self.walls = pygame.sprite.Group()
         self.pacgums = pygame.sprite.Group()
         self.superpacgums = pygame.sprite.Group()
-        self.sprites.add(self.red_ghost)
-        self.sprites.add(self.pink_ghost)
-        self.sprites.add(self.blue_ghost)
-        self.sprites.add(self.orange_ghost)
+        for ghost in ghosts:
+            self.ghosts.add(ghost)
+            self.sprites.add(ghost)
         self.sprites.add(self.hud.score)
         self.sprites.add(self.hud.lives)
         self.sprites.add(self.hud.timer)
         self.create_walls()
         self.create_pacgums()
+        self.points_per_pacgum = points_per_pacgum
+        self.points_per_super_pacgum = points_per_super_pacgum
+        self.points_per_ghost = points_per_ghost
 
     def create_walls(self) -> None:
         offset_y = 0
@@ -94,12 +101,12 @@ class Game:
         self.sprites.add(right_wall)
 
     def get_superpacgum(self) -> list[tuple[int, int]]:
-        cells = [
-            (row, col)
-            for row in range(len(self.maze.maze))
-            for col in range(len(self.maze.maze[0]))
+        return [
+            (0, 0),
+            (self.width - 1, 0),
+            (self.width - 1, self.height - 1),
+            (0, self.height - 1),
         ]
-        return random.sample(cells, 4)
 
     def create_pacgums(self) -> None:
         offset_y = 23
@@ -127,14 +134,24 @@ class Game:
         self.lives -= 1
         self.player.rect.x = (self.width - 1) // 2 * 40 + 10
         self.player.rect.y = (self.height - 1) // 2 * 40 + 10
-        self.red_ghost.rect.x = 10
-        self.red_ghost.rect.y = 10
-        self.pink_ghost.rect.x = (self.width - 1) * 40 + 10
-        self.pink_ghost.rect.y = 10
-        self.blue_ghost.rect.x = (self.width - 1) * 40 + 10
-        self.blue_ghost.rect.y = (self.height - 1) * 40 + 10
-        self.orange_ghost.rect.x = 10
-        self.orange_ghost.rect.y = (self.height - 1) * 40 + 10
+        coords = [
+            (10, 10),
+            ((self.width - 1) * 40 + 10, 10),
+            ((self.width - 1) * 40 + 10, (self.height - 1) * 40 + 10),
+            (10, (self.height - 1) * 40 + 10),
+        ]
+        for i in range(len(self.ghosts.sprites())):
+            current_time = pygame.time.get_ticks()
+            self.ghosts.sprites()[i].rect.x = coords[i][0]
+            self.ghosts.sprites()[i].rect.y = coords[i][1]
+            self.ghosts.sprites()[i].eaten = False
+            self.ghosts.sprites()[i].evade = False
+            self.ghosts.sprites()[i].last_cycle = current_time
+            self.ghosts.sprites()[i].images = []
+            self.ghosts.sprites()[i].set_animation()
+            self.ghosts.sprites()[i].direction = self.ghosts.sprites()[
+                i
+            ].target_player(self.player.get_coordinates())
 
     def event(self, event) -> None:
         from src.game_sprites import Direction
