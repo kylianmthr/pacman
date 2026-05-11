@@ -22,7 +22,7 @@ class Music:
     def launch_game_song(self):
         mixer.music.load(self.game_song)
         mixer.music.set_volume(0.7)
-        mixer.music.play(loops=-1)
+        mixer.music.play()
 
 
 class Engine:
@@ -67,7 +67,6 @@ class Engine:
             wall.color = color
             wall.image.fill(color)
 
-
     def next_level(self) -> None:
         self.level += 1
         self.screen_width = self.levels[self.level].width * 40 + 10
@@ -91,8 +90,6 @@ class Engine:
                 if self.menu_active:
                     menu_event = self.menu.event(event)
                     if menu_event == "start":
-                        if self.music_active:
-                            self.music.launch_game_song()
                         self.menu_active = False
                     elif menu_event == "exit":
                         self.running = False
