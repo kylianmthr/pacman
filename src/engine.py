@@ -6,23 +6,7 @@ from src.models import LevelType
 from src.menu import Menu
 from src.game import Game
 from src.leaderboard import Leaderboard
-
-
-class Music:
-    def __init__(self, start_song, game_song):
-        mixer.init()
-        self.start_song = start_song
-        self.game_song = game_song
-
-    def launch_start_song(self):
-        mixer.music.load(self.start_song)
-        mixer.music.set_volume(0.7)
-        mixer.music.play()
-
-    def launch_game_song(self):
-        mixer.music.load(self.game_song)
-        mixer.music.set_volume(0.7)
-        mixer.music.play()
+from src.music import Music
 
 
 class Engine:
@@ -58,9 +42,12 @@ class Engine:
             seed,
         )
         self.music = Music(
-            "./assets/pacman_beginning.mp3", "./assets/eat_dot.wav"
+            "./assets/pacman_beginning.mp3",
+            "./assets/eat_dot.wav",
+            "./assets/ghost.wav",
+            "./assets/pacgum.wav",
         )
-        self.music.launch_start_song()
+        self.music.start_music()
 
     def change_wall_color(self, color):
         for wall in self.game.walls:
@@ -91,11 +78,13 @@ class Engine:
                     menu_event = self.menu.event(event)
                     if menu_event == "start":
                         self.menu_active = False
+                        if self.music_active:
+                            self.music.ghost_sound_effect()
                     elif menu_event == "exit":
                         self.running = False
                     elif menu_event == "music_on":
                         self.music_active = True
-                        self.music.launch_start_song()
+                        self.music.start_music()
                     elif menu_event == "music_off":
                         self.music_active = False
                         mixer.music.stop()

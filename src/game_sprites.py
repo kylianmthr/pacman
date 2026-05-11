@@ -6,7 +6,6 @@ import pygame
 from src.game import Game
 from src.engine import Engine
 from pygame.math import Vector2
-from pygame import mixer
 
 
 class Direction(Enum):
@@ -78,16 +77,12 @@ class GameSprite(pygame.sprite.Sprite):
         next_rect.x += (
             speed
             if direction == Direction.EAST
-            else -speed
-            if direction == Direction.WEST
-            else 0
+            else -speed if direction == Direction.WEST else 0
         )
         next_rect.y += (
             speed
             if direction == Direction.SOUTH
-            else -speed
-            if direction == Direction.NORTH
-            else 0
+            else -speed if direction == Direction.NORTH else 0
         )
         return next_rect
 
@@ -142,14 +137,16 @@ class Player(GameSprite):
         index = self.rect.collidelist(pacgums)
         if index != -1:
             if self.engine.music_active:
-                self.engine.music.launch_game_song()
-            self.engine.score += 1
+                self.engine.music.pacgum_sound_effect()
+            self.game.score += 1
             pacgums[index].kill()
 
     def superpacgum(self):
         pacgums = self.game.superpacgums.sprites()
         index = self.rect.collidelist(pacgums)
         if index != -1:
+            if self.engine.music_active:
+                self.engine.music.superpacgum_sound_effect()
             for ghost in self.game.ghosts.sprites():
                 ghost.set_evade()
             pacgums[index].kill()
