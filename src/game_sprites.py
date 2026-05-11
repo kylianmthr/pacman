@@ -77,12 +77,16 @@ class GameSprite(pygame.sprite.Sprite):
         next_rect.x += (
             speed
             if direction == Direction.EAST
-            else -speed if direction == Direction.WEST else 0
+            else -speed
+            if direction == Direction.WEST
+            else 0
         )
         next_rect.y += (
             speed
             if direction == Direction.SOUTH
-            else -speed if direction == Direction.NORTH else 0
+            else -speed
+            if direction == Direction.NORTH
+            else 0
         )
         return next_rect
 
@@ -138,7 +142,7 @@ class Player(GameSprite):
         if index != -1:
             if self.engine.music_active:
                 self.engine.music.pacgum_sound_effect()
-            self.game.score += 1
+            self.engine.score += 1
             pacgums[index].kill()
 
     def superpacgum(self):
