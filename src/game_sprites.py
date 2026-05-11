@@ -168,7 +168,6 @@ class Player(GameSprite):
             else:
                 if not ghost.eaten:
                     pass
-                    # print("test")
 
     def update(self):
         self.movement(
@@ -354,6 +353,9 @@ class Ghost(ABC, GameSprite):
                 self.images = []
                 self.set_animation()
                 self.eaten = False
+                self.disered_direction = self.target_player(
+                    self.game.player.get_coordinates()
+                )
         if self.eaten:
             if (
                 float(self.get_coordinates()[0]),
@@ -647,7 +649,12 @@ class OrangeGhost(Ghost):
         )
         self.last_pos = self.get_last_pos()
         if self.game.maze.maze[pos[1]][pos[0]].count("0") == 1:
-            self.disered_direction = Direction((self.direction.value + 2) % 4)
+            if pos == (self.spawn[0] // 40, self.spawn[1] // 40):
+                self.disered_direction = self.target_player(player_coordinates)
+            else:
+                self.disered_direction = Direction(
+                    (self.direction.value + 2) % 4
+                )
         if self.game.maze.maze[pos[1]][pos[0]].count("0") == 2:
             if (
                 self.game.maze.maze[pos[1]][pos[0]][self.direction.value]
