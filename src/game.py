@@ -17,6 +17,7 @@ class Game:
         from src.hud import HUD
 
         self.engine = engine
+        self.lives = 3
         self.hud = HUD(self, self.engine)
         self.width = width
         self.height = height
@@ -24,8 +25,8 @@ class Game:
         self.sprites = pygame.sprite.Group()
         self.ghosts = pygame.sprite.Group()
         self.player = Player(self, self.engine)
-        self.player.rect.x = 10
-        self.player.rect.y = 10
+        self.player.rect.x = (self.width - 1) // 2 * 40 + 10
+        self.player.rect.y = (self.height - 1) // 2 * 40 + 10
         self.maze = generator.MazeGenerator(
             self.width,
             self.height,
@@ -60,6 +61,7 @@ class Game:
         self.sprites.add(self.blue_ghost)
         self.sprites.add(self.orange_ghost)
         self.sprites.add(self.hud.score)
+        self.sprites.add(self.hud.lives)
         self.create_walls()
         self.create_pacgums()
 
@@ -118,6 +120,19 @@ class Game:
             y += 1
             offset_y += 40
 
+    def respawn(self) -> None:
+        self.lives -= 1
+        self.player.rect.x = (self.width - 1) // 2 * 40 + 10
+        self.player.rect.y = (self.height - 1) // 2 * 40 + 10
+        self.red_ghost.rect.x = 10
+        self.red_ghost.rect.y = 10
+        self.pink_ghost.rect.x = (self.width - 1) * 40 + 10
+        self.pink_ghost.rect.y = 10
+        self.blue_ghost.rect.x = (self.width - 1) * 40 + 10
+        self.blue_ghost.rect.y = (self.height - 1) * 40 + 10
+        self.orange_ghost.rect.x = 10
+        self.orange_ghost.rect.y = (self.height - 1) * 40 + 10
+
     def event(self, event) -> None:
         from src.game_sprites import Direction
 
@@ -139,3 +154,6 @@ class Game:
         if len(self.pacgums.sprites()) == 0 and not self.engine.loading:
             self.engine.loading = True
             self.engine.next_level()
+        if self.lives < 0:
+            # Le game over
+            pass
