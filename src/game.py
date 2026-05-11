@@ -1,5 +1,6 @@
 import pygame
 from src.pacgum import Pacgum
+from src.timer import Timer
 from src.wall import Wall
 from mazegen import generator
 import random
@@ -18,6 +19,7 @@ class Game:
 
         self.engine = engine
         self.lives = 3
+        self.timer = Timer(90)
         self.hud = HUD(self, self.engine)
         self.width = width
         self.height = height
@@ -62,6 +64,7 @@ class Game:
         self.sprites.add(self.orange_ghost)
         self.sprites.add(self.hud.score)
         self.sprites.add(self.hud.lives)
+        self.sprites.add(self.hud.timer)
         self.create_walls()
         self.create_pacgums()
 
@@ -154,6 +157,6 @@ class Game:
         if len(self.pacgums.sprites()) == 0 and not self.engine.loading:
             self.engine.loading = True
             self.engine.next_level()
-        if self.lives < 0:
+        if self.lives < 0 or self.timer.is_expired():
             # Le game over
             pass
