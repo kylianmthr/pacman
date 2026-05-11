@@ -1,6 +1,5 @@
 from src.leader_board_menu import LeaderBoardMenu
 from src.welcome_menu import WelcomeMenu
-from src.game_over import GameOverMenu
 
 
 class Menu:
