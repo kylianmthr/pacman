@@ -2,19 +2,19 @@
 	"highscore_filename": "test",
 	"level": [
 		{
-			"width": 8,
-			"height": 8
+			"width": 10,
+			"height": 10
 		},
 		{
 			"width": 10,
 			"height": 10
-		},
+		}
 	],
-	"lives": 5,
+	"lives": 2,  
 	"pacgum": 5,
 	"points_per_pacgum": 5,
 	"points_per_super_pacgum": 5,
 	"points_per_ghost": 5,
-	"seed": 5,
-	"level_max_time": 90,
+	"seed": 42,
+	"level_max_time": 90
 }

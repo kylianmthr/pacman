@@ -1,8 +1,7 @@
 import pygame
-from pygame import mixer
 import os
 
-from src.models import Config, LevelType
+from src.models import Config
 from src.menu import Menu
 from src.game import Game
 from src.leaderboard import Leaderboard
@@ -12,6 +11,7 @@ from src.music import Music
 class Engine:
     def __init__(self, config: Config) -> None:
         os.environ["SDL_VIDEO_CENTERED"] = "1"
+        self.color = "white"
         self.config = config
         self.menu_active = True
         self.level = 0
@@ -50,10 +50,10 @@ class Engine:
         )
         self.music.start_music()
 
-    def change_wall_color(self, color):
+    def change_wall_color(self):
         for wall in self.game.walls:
-            wall.color = color
-            wall.image.fill(color)
+            wall.color = self.color
+            wall.image.fill(self.color)
 
     def next_level(self) -> None:
         self.level += 1
@@ -79,24 +79,7 @@ class Engine:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if self.menu_active:
-                    menu_event = self.menu.event(event)
-                    if menu_event == "start":
-                        self.menu_active = False
-                        if self.music_active:
-                            self.music.ghost_sound_effect()
-                    elif menu_event == "exit":
-                        self.running = False
-                    elif menu_event == "music_on":
-                        self.music_active = True
-                        self.music.start_music()
-                    elif menu_event == "music_off":
-                        self.music_active = False
-                        mixer.music.stop()
-                    elif menu_event == "":
-                        pass
-                    else:
-                        self.change_wall_color(menu_event)
-                        print(f"new color wall = {menu_event}")
+                    self.menu.event(event)
                 else:
                     self.game.event(event)
             if event.type == pygame.QUIT:
