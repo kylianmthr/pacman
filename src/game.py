@@ -22,7 +22,7 @@ class Game:
         self.screen = screen
         self.sprites = pygame.sprite.Group()
         self.ghosts = pygame.sprite.Group()
-        self.player = Player(self)
+        self.player = Player(self, self.engine)
         self.player.rect.x = 10
         self.player.rect.y = 10
         self.maze = generator.MazeGenerator(

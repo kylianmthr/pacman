@@ -4,6 +4,7 @@ import random
 import math
 import pygame
 from src.game import Game
+from src.engine import Engine
 from pygame.math import Vector2
 
 
@@ -16,7 +17,7 @@ class Direction(Enum):
 
 class GameSprite(pygame.sprite.Sprite):
     def __init__(
-        self, engine: Game, sprite_coordinates: tuple[int, int]
+        self, game: Game, sprite_coordinates: tuple[int, int]
     ) -> None:
         pygame.sprite.Sprite.__init__(self)
         self.sprite_sheet = pygame.image.load(
@@ -32,7 +33,7 @@ class GameSprite(pygame.sprite.Sprite):
         self.disered_direction: Direction = self.direction
         self.last_update = pygame.time.get_ticks()
         self.frame_cooldown = 150
-        self.engine = engine
+        self.game = game
 
     def get_sprite(
         self,
@@ -95,7 +96,7 @@ class GameSprite(pygame.sprite.Sprite):
         if self.direction != self.disered_direction:
             if (
                 self.get_next_rect(self.disered_direction, speed).collidelist(
-                    self.engine.walls.sprites()
+                    self.game.walls.sprites()
                 )
                 == -1
                 and self.rect.x % 40 == 10
@@ -104,7 +105,7 @@ class GameSprite(pygame.sprite.Sprite):
                 self.direction = self.disered_direction
         if (
             self.get_next_rect(self.direction, speed).collidelist(
-                self.engine.walls.sprites()
+                self.game.walls.sprites()
             )
             == -1
         ):
@@ -130,30 +131,31 @@ class GameSprite(pygame.sprite.Sprite):
 
 
 class Player(GameSprite):
-    def __init__(self, engine: Game) -> None:
-        super().__init__(engine, (0, 3))
+    def __init__(self, game: Game, engine: Engine) -> None:
+        super().__init__(game, (0, 3))
+        self.engine = engine
         self.last_pos = self.get_coordinates()
 
     def pacgum(self):
 
-        pacgums = self.engine.pacgums.sprites()
+        pacgums = self.game.pacgums.sprites()
         index = self.rect.collidelist(pacgums)
         if index != -1:
             if self.engine.music_active:
                 self.engine.music.launch_game_song()
-            self.engine.score += 1
+            self.game.score += 1
             pacgums[index].kill()
 
     def superpacgum(self):
-        pacgums = self.engine.superpacgums.sprites()
+        pacgums = self.game.superpacgums.sprites()
         index = self.rect.collidelist(pacgums)
         if index != -1:
-            for ghost in self.engine.ghosts.sprites():
+            for ghost in self.game.ghosts.sprites():
                 ghost.set_evade()
             pacgums[index].kill()
 
     def ghosts(self):
-        ghosts = self.engine.ghosts.sprites()
+        ghosts = self.game.ghosts.sprites()
         index = self.rect.collidelist(ghosts)
         if index != -1:
             ghost = ghosts[index]
@@ -193,11 +195,11 @@ class Player(GameSprite):
 class Ghost(ABC, GameSprite):
     def __init__(
         self,
-        engine: Game,
+        game: Game,
         sprite_coordinates: tuple[int, int],
         spawn_coordinates: tuple[int, int],
     ) -> None:
-        super().__init__(engine, sprite_coordinates)
+        super().__init__(game, sprite_coordinates)
         self.last_pos = self.get_coordinates()
         self.last_cycle = pygame.time.get_ticks()
         self.evade = False
@@ -208,13 +210,13 @@ class Ghost(ABC, GameSprite):
     def get_neighbors_coordinates(self, ghost_coordinates: tuple[int, int]):
         x, y = ghost_coordinates
         neighbors = []
-        if self.engine.maze.maze[y][x][0] == "0":
+        if self.game.maze.maze[y][x][0] == "0":
             neighbors.append(((x - 1, y), Direction.WEST))
-        if self.engine.maze.maze[y][x][2] == "0":
+        if self.game.maze.maze[y][x][2] == "0":
             neighbors.append(((x + 1, y), Direction.EAST))
-        if self.engine.maze.maze[y][x][1] == "0":
+        if self.game.maze.maze[y][x][1] == "0":
             neighbors.append(((x, y + 1), Direction.SOUTH))
-        if self.engine.maze.maze[y][x][3] == "0":
+        if self.game.maze.maze[y][x][3] == "0":
             neighbors.append(((x, y - 1), Direction.NORTH))
         return neighbors
 
@@ -281,11 +283,11 @@ class Ghost(ABC, GameSprite):
     def evade_movement(self):
         pos = self.get_coordinates()
         self.last_pos = self.get_last_pos()
-        if self.engine.maze.maze[pos[1]][pos[0]].count("0") == 1:
+        if self.game.maze.maze[pos[1]][pos[0]].count("0") == 1:
             self.disered_direction = Direction((self.direction.value + 2) % 4)
-        if self.engine.maze.maze[pos[1]][pos[0]].count("0") == 2:
+        if self.game.maze.maze[pos[1]][pos[0]].count("0") == 2:
             if (
-                self.engine.maze.maze[pos[1]][pos[0]][self.direction.value]
+                self.game.maze.maze[pos[1]][pos[0]][self.direction.value]
                 == "1"
             ):
                 neighbors = self.get_neighbors_coordinates(pos)
@@ -300,7 +302,7 @@ class Ghost(ABC, GameSprite):
                         )
                     )
                 self.disered_direction = neighbors[0][1]
-        if self.engine.maze.maze[pos[1]][pos[0]].count("0") >= 3:
+        if self.game.maze.maze[pos[1]][pos[0]].count("0") >= 3:
             neighbors = self.get_neighbors_coordinates(pos)
             if (
                 self.last_pos,
@@ -385,9 +387,9 @@ class Ghost(ABC, GameSprite):
                 )
 
     def target_player(self, player_coordinates: tuple[int, int]):
-        self.engine.maze.entry = self.get_coordinates()
-        self.engine.maze.exit = player_coordinates
-        solution = self.engine.maze.parser(self.engine.maze.solve())
+        self.game.maze.entry = self.get_coordinates()
+        self.game.maze.exit = player_coordinates
+        solution = self.game.maze.parser(self.game.maze.solve())
         if solution:
             if solution[0] == "N":
                 return Direction.NORTH
@@ -407,23 +409,23 @@ class Ghost(ABC, GameSprite):
 class RedGhost(Ghost):
     def __init__(
         self,
-        engine: Game,
+        game: Game,
         sprite_coordinates: tuple[int, int],
         spawn_coordinates: tuple[int, int],
     ) -> None:
-        super().__init__(engine, sprite_coordinates, spawn_coordinates)
+        super().__init__(game, sprite_coordinates, spawn_coordinates)
         self.last_pos = self.get_coordinates()
 
     def get_neighbors_coordinates(self, ghost_coordinates: tuple[int, int]):
         x, y = ghost_coordinates
         neighbors = []
-        if self.engine.maze.maze[y][x][0] == "0":
+        if self.game.maze.maze[y][x][0] == "0":
             neighbors.append(((x - 1, y), Direction.WEST))
-        if self.engine.maze.maze[y][x][2] == "0":
+        if self.game.maze.maze[y][x][2] == "0":
             neighbors.append(((x + 1, y), Direction.EAST))
-        if self.engine.maze.maze[y][x][1] == "0":
+        if self.game.maze.maze[y][x][1] == "0":
             neighbors.append(((x, y + 1), Direction.SOUTH))
-        if self.engine.maze.maze[y][x][3] == "0":
+        if self.game.maze.maze[y][x][3] == "0":
             neighbors.append(((x, y - 1), Direction.NORTH))
         return neighbors
 
@@ -433,7 +435,7 @@ class RedGhost(Ghost):
         elif self.eaten:
             self.eaten_cycle()
         else:
-            target_coordinates = self.engine.player.get_coordinates()
+            target_coordinates = self.game.player.get_coordinates()
             if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
                 self.disered_direction = self.target_player(target_coordinates)
                 self.scatter_cycle()
@@ -450,41 +452,38 @@ class RedGhost(Ghost):
 class PinkGhost(Ghost):
     def __init__(
         self,
-        engine: Game,
+        game: Game,
         sprite_coordinates: tuple[int, int],
         spawn_coordinates: tuple[int, int],
     ) -> None:
-        super().__init__(engine, sprite_coordinates, spawn_coordinates)
+        super().__init__(game, sprite_coordinates, spawn_coordinates)
         self.last_pos = self.get_coordinates()
 
     def coordinate_is_in_front_player(
         self, target_coordinate, player_coordinate, i
     ):
-        self.engine.maze.entry = (
+        self.game.maze.entry = (
             int(player_coordinate[0]),
             int(player_coordinate[1]),
         )
-        self.engine.maze.exit = (
+        self.game.maze.exit = (
             int(target_coordinate[0]),
             int(target_coordinate[1]),
         )
-        solution = self.engine.maze.parser(self.engine.maze.solve())
+        solution = self.game.maze.parser(self.game.maze.solve())
         if len(solution) != i:
             return False
         return True
 
     def is_valid_coordinate(self, target_coordinate):
-        if (
-            target_coordinate[0] < 0
-            or target_coordinate[0] >= self.engine.width
-        ):
+        if target_coordinate[0] < 0 or target_coordinate[0] >= self.game.width:
             return False
         if (
             target_coordinate[1] < 0
-            or target_coordinate[1] >= self.engine.height
+            or target_coordinate[1] >= self.game.height
         ):
             return False
-        if target_coordinate in self.engine.maze.forty_two_cell:
+        if target_coordinate in self.game.maze.forty_two_cell:
             return False
 
         return True
@@ -494,7 +493,7 @@ class PinkGhost(Ghost):
         while True:
             coords = [(-i, 0), (0, i), (i, 0), (0, -i)]
             target = Vector2(player_coordinates) - Vector2(
-                coords[self.engine.player.direction.value]
+                coords[self.game.player.direction.value]
             )
             if i == 0:
                 break
@@ -510,12 +509,12 @@ class PinkGhost(Ghost):
             else:
                 break
 
-        self.engine.maze.entry = self.get_coordinates()
-        self.engine.maze.exit = (int(target[0]), int(target[1]))
+        self.game.maze.entry = self.get_coordinates()
+        self.game.maze.exit = (int(target[0]), int(target[1]))
         self.target_player((int(target[0]), int(target[1])))
-        solution = self.engine.maze.parser(self.engine.maze.solve())
+        solution = self.game.maze.parser(self.game.maze.solve())
         if len(solution) <= 4:
-            self.engine.maze.exit = tuple(player_coordinates)
+            self.game.maze.exit = tuple(player_coordinates)
             target = player_coordinates
         return self.target_player((int(target[0]), int(target[1])))
 
@@ -526,7 +525,7 @@ class PinkGhost(Ghost):
             self.eaten_cycle()
         else:
             if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
-                target_coordinates = self.engine.player.get_coordinates()
+                target_coordinates = self.game.player.get_coordinates()
                 self.disered_direction = self.target(target_coordinates)
                 self.scatter_cycle()
             self.movement(
@@ -542,47 +541,44 @@ class PinkGhost(Ghost):
 class BlueGhost(Ghost):
     def __init__(
         self,
-        engine: Game,
+        game: Game,
         sprite_coordinates: tuple[int, int],
         spawn_coordinates: tuple[int, int],
     ) -> None:
-        super().__init__(engine, sprite_coordinates, spawn_coordinates)
+        super().__init__(game, sprite_coordinates, spawn_coordinates)
         self.last_pos = self.get_coordinates()
 
     def coordinate_is_in_front_player(
         self, target_coordinate, player_coordinate, i
     ):
-        self.engine.maze.entry = (
+        self.game.maze.entry = (
             int(player_coordinate[0]),
             int(player_coordinate[1]),
         )
-        self.engine.maze.exit = (
+        self.game.maze.exit = (
             int(target_coordinate[0]),
             int(target_coordinate[1]),
         )
-        solution = self.engine.maze.parser(self.engine.maze.solve())
+        solution = self.game.maze.parser(self.game.maze.solve())
         if len(solution) != i:
             return False
         return True
 
     def is_valid_coordinate(self, target_coordinate):
-        if (
-            target_coordinate[0] < 0
-            or target_coordinate[0] >= self.engine.width
-        ):
+        if target_coordinate[0] < 0 or target_coordinate[0] >= self.game.width:
             return False
         if (
             target_coordinate[1] < 0
-            or target_coordinate[1] >= self.engine.height
+            or target_coordinate[1] >= self.game.height
         ):
             return False
-        if target_coordinate in self.engine.maze.forty_two_cell:
+        if target_coordinate in self.game.maze.forty_two_cell:
             return False
 
         return True
 
     def target(self, player_coordinates: tuple[int, int]):
-        red_position = self.engine.red_ghost.get_coordinates()
+        red_position = self.game.red_ghost.get_coordinates()
         target = red_position
         target = (
             Vector2(player_coordinates) - Vector2(red_position)
@@ -604,8 +600,8 @@ class BlueGhost(Ghost):
             target,
         ):
             target = player_coordinates
-        self.engine.maze.entry = self.get_coordinates()
-        self.engine.maze.exit = (int(target[0]), int(target[1]))
+        self.game.maze.entry = self.get_coordinates()
+        self.game.maze.exit = (int(target[0]), int(target[1]))
         return self.target_player((int(target[0]), int(target[1])))
 
     def update(self):
@@ -615,7 +611,7 @@ class BlueGhost(Ghost):
             self.eaten_cycle()
         else:
             if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
-                target_coordinates = self.engine.player.get_coordinates()
+                target_coordinates = self.game.player.get_coordinates()
                 self.disered_direction = self.target(target_coordinates)
                 self.scatter_cycle()
             self.movement(
@@ -631,23 +627,23 @@ class BlueGhost(Ghost):
 class OrangeGhost(Ghost):
     def __init__(
         self,
-        engine: Game,
+        game: Game,
         sprite_coordinates: tuple[int, int],
         spawn_coordinates: tuple[int, int],
     ) -> None:
-        super().__init__(engine, sprite_coordinates, spawn_coordinates)
+        super().__init__(game, sprite_coordinates, spawn_coordinates)
         self.last_pos = self.get_coordinates()
 
     def get_neighbors_coordinates(self, ghost_coordinates: tuple[int, int]):
         x, y = ghost_coordinates
         neighbors = []
-        if self.engine.maze.maze[y][x][0] == "0":
+        if self.game.maze.maze[y][x][0] == "0":
             neighbors.append(((x - 1, y), Direction.WEST))
-        if self.engine.maze.maze[y][x][2] == "0":
+        if self.game.maze.maze[y][x][2] == "0":
             neighbors.append(((x + 1, y), Direction.EAST))
-        if self.engine.maze.maze[y][x][1] == "0":
+        if self.game.maze.maze[y][x][1] == "0":
             neighbors.append(((x, y + 1), Direction.SOUTH))
-        if self.engine.maze.maze[y][x][3] == "0":
+        if self.game.maze.maze[y][x][3] == "0":
             neighbors.append(((x, y - 1), Direction.NORTH))
         return neighbors
 
@@ -658,11 +654,11 @@ class OrangeGhost(Ghost):
             + (pos[1] - player_coordinates[1]) ** 2
         )
         self.last_pos = self.get_last_pos()
-        if self.engine.maze.maze[pos[1]][pos[0]].count("0") == 1:
+        if self.game.maze.maze[pos[1]][pos[0]].count("0") == 1:
             self.disered_direction = Direction((self.direction.value + 2) % 4)
-        if self.engine.maze.maze[pos[1]][pos[0]].count("0") == 2:
+        if self.game.maze.maze[pos[1]][pos[0]].count("0") == 2:
             if (
-                self.engine.maze.maze[pos[1]][pos[0]][self.direction.value]
+                self.game.maze.maze[pos[1]][pos[0]][self.direction.value]
                 == "1"
             ):
                 neighbors = self.get_neighbors_coordinates(pos)
@@ -677,7 +673,7 @@ class OrangeGhost(Ghost):
                         )
                     )
                 self.disered_direction = neighbors[0][1]
-        if self.engine.maze.maze[pos[1]][pos[0]].count("0") >= 3:
+        if self.game.maze.maze[pos[1]][pos[0]].count("0") >= 3:
             if distance >= 4:
                 self.disered_direction = self.target_player(player_coordinates)
             else:
@@ -692,7 +688,7 @@ class OrangeGhost(Ghost):
             self.eaten_cycle()
         else:
             if self.rect.x % 40 == 10 and self.rect.y % 40 == 10:
-                self.target(self.engine.player.get_coordinates())
+                self.target(self.game.player.get_coordinates())
                 self.scatter_cycle()
             self.movement(
                 {
