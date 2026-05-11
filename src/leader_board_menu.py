@@ -8,23 +8,20 @@ from src.leaderboard import Leaderboard
 
 
 class LeaderBoardMenu:
-    def __init__(self, screen, screen_width, screen_height, leaderboard):
+    def __init__(self, engine):
+        self.engine = engine
         pygame.font.init()
-        self.screen = screen
         self.assets = pygame.sprite.Group()
-        self.screen_width = screen_width
-        self.screen_height = screen_height
         self.buttons = []
         self.button_idx = 0
         self.cursors_map = {}
         self.create_static_surfaces()
-        self.leaderboard = leaderboard
 
-    def show(self, screen_width, screen_height):
-        self.screen_height = screen_height
-        self.screen_width = screen_width
-        self.screen.fill("black")
-        self.assets.draw(self.screen)
+    def show(
+        self,
+    ):
+        self.engine.screen.fill("black")
+        self.assets.draw(self.engine.screen)
 
     def stop_menu(self):
         for sprite in self.assets:
@@ -43,7 +40,10 @@ class LeaderBoardMenu:
                 "1              9",
                 "yellow",
                 pacfont,
-                (self.screen_width // 2, self.screen_height * 0.1),
+                (
+                    self.engine.screen_width // 2,
+                    self.engine.screen_height * 0.1,
+                ),
             )
         )
         self.assets.add(
@@ -51,7 +51,10 @@ class LeaderBoardMenu:
                 "PACMAN",
                 "yellow",
                 pacfont,
-                (self.screen_width // 2, self.screen_height * 0.1),
+                (
+                    self.engine.screen_width // 2,
+                    self.engine.screen_height * 0.1,
+                ),
             )
         )
         self.assets.add(
@@ -59,7 +62,10 @@ class LeaderBoardMenu:
                 "22222222222222",
                 "yellow",
                 pacfont,
-                (self.screen_width // 2, self.screen_height * 0.1 + 40),
+                (
+                    self.engine.screen_width // 2,
+                    self.engine.screen_height * 0.1 + 40,
+                ),
             )
         )
 
@@ -67,7 +73,10 @@ class LeaderBoardMenu:
             Button(
                 "RETURN",
                 swfont,
-                (self.screen_width // 2, self.screen_height * 0.27),
+                (
+                    self.engine.screen_width // 2,
+                    self.engine.screen_height * 0.27,
+                ),
                 1,
                 "yellow",
             )
@@ -108,13 +117,17 @@ class LeaderBoardMenu:
                 + Vector2(-15, 0),
             )
         )
-        self.assets.add(Wall(5, self.screen_height, (0, 0), "white", "frame"))
-        self.assets.add(Wall(self.screen_width, 5, (0, 0), "white", "frame"))
+        self.assets.add(
+            Wall(5, self.engine.screen_height, (0, 0), "white", "frame")
+        )
+        self.assets.add(
+            Wall(self.engine.screen_width, 5, (0, 0), "white", "frame")
+        )
         self.assets.add(
             Wall(
-                self.screen_width,
+                self.engine.screen_width,
                 5,
-                (0, self.screen_height - 5),
+                (0, self.engine.screen_height - 5),
                 "white",
                 "frame",
             )
@@ -122,8 +135,8 @@ class LeaderBoardMenu:
         self.assets.add(
             Wall(
                 5,
-                self.screen_height,
-                (self.screen_width - 5, 0),
+                self.engine.screen_height,
+                (self.engine.screen_width - 5, 0),
                 "white",
                 "frame",
             )
@@ -132,16 +145,16 @@ class LeaderBoardMenu:
     def update_leaderboard_surfaces(self, frame_color):
         [pygame.sprite.Sprite.kill(asset) for asset in self.assets]
         self.create_static_surfaces()
-        self.leaderboard.data_retriever()
+        self.engine.leaderboard.data_retriever()
         superfunnel = pygame.font.Font("./assets/SuperFunnel.ttf", 25)
         karma_future = pygame.font.Font("./assets/KarmaFuture.ttf", 25)
         coordinate_player_name = Vector2(
-            self.screen_width * 0.05, self.screen_height * 0.3
+            self.engine.screen_width * 0.05, self.engine.screen_height * 0.3
         )
         coordinate_player_score = Vector2(
-            self.screen_width * 0.95, self.screen_height * 0.3
+            self.engine.screen_width * 0.95, self.engine.screen_height * 0.3
         )
-        for player in self.leaderboard.high_scores.best_players:
+        for player in self.engine.leaderboard.high_scores.best_players:
             if player.score > 0:
                 coordinate_player_name += Vector2(0, 30)
                 coordinate_player_score += Vector2(0, 30)
