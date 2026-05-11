@@ -142,7 +142,7 @@ class Player(GameSprite):
         if index != -1:
             if self.engine.music_active:
                 self.engine.music.pacgum_sound_effect()
-            self.engine.score += 1
+            self.engine.score += self.game.points_per_pacgum
             pacgums[index].kill()
 
     def superpacgum(self):
@@ -153,6 +153,7 @@ class Player(GameSprite):
                 self.engine.music.superpacgum_sound_effect()
             for ghost in self.game.ghosts.sprites():
                 ghost.set_evade()
+            self.engine.score += self.game.points_per_super_pacgum
             pacgums[index].kill()
 
     def ghosts(self):
@@ -166,6 +167,7 @@ class Player(GameSprite):
                 ghost.eaten = True
                 ghost.evade = False
                 ghost.set_eaten()
+                self.engine.score += self.game.points_per_ghost
             else:
                 if not ghost.eaten:
                     self.game.respawn()
@@ -573,7 +575,12 @@ class BlueGhost(Ghost):
         return True
 
     def target(self, player_coordinates: tuple[int, int]):
-        red_position = self.game.red_ghost.get_coordinates()
+        red_ghost: list[RedGhost] = [
+            sprite
+            for sprite in self.game.ghosts.sprites()
+            if isinstance(sprite, RedGhost)
+        ]
+        red_position = red_ghost[0].get_coordinates()
         target = red_position
         target = (
             Vector2(player_coordinates) - Vector2(red_position)
