@@ -1,4 +1,5 @@
 import pygame
+from src.cheat import Cheats
 from src.pacgum import Pacgum
 from src.timer import Timer
 from src.wall import Wall
@@ -74,6 +75,7 @@ class Game:
         self.points_per_pacgum = points_per_pacgum
         self.points_per_super_pacgum = points_per_super_pacgum
         self.points_per_ghost = points_per_ghost
+        self.cheats = Cheats(self)
 
     def create_walls(self) -> None:
         offset_y = 0
@@ -155,6 +157,8 @@ class Game:
 
     def event(self, event) -> None:
         from src.game_sprites import Direction
+
+        self.cheats.event(event)
 
         if event.type == pygame.KEYDOWN:
             player = self.sprites.sprites()[0]
