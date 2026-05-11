@@ -1,33 +1,24 @@
 import pygame
 from pygame.math import Vector2
-from src.menu_sprites import Button, Picture, Text
+from src.menu_sprites import Button, Picture
 from src.wall import Wall
 
 
 class WelcomeMenu:
-    def __init__(self, screen, screen_width, screen_height):
+    def __init__(self, engine):
         pygame.font.init()
-        self.screen = screen
+        self.engine = engine
         self.assets = pygame.sprite.Group()
         self.music_state = "./assets/music_on.png"
-        self.screen_width = screen_width
-        self.screen_height = screen_height
-        # Peut etre foutre ca dans l'engine (le prendre en parametre)
         self.frame_color = "white"
         self.buttons = []
         self.button_idx = 0
         self.cursors_map = {}
         self.create_static_surfaces()
 
-    def show(self, screen_width, screen_height):
-        self.screen_height = screen_height
-        self.screen_width = screen_width
-        self.screen.fill("black")
-        self.assets.draw(self.screen)
-
-    def stop_menu(self):
-        for sprite in self.assets:
-            sprite.kill()
+    def show(self):
+        self.engine.screen.fill("black")
+        self.assets.draw(self.engine.screen)
 
     def update_sprite_coordinate(
         self, sprite: pygame.sprite.Sprite, coordinates: tuple[int, int]
@@ -77,15 +68,22 @@ class WelcomeMenu:
                 "./assets/logo.png",
                 350,
                 200,
-                ((self.screen_width // 2, self.screen_height * 0.15)
-                )
+                (
+                    (
+                        self.engine.screen_width // 2,
+                        self.engine.screen_height * 0.15,
+                    )
+                ),
             )
         )
         self.assets.add(
             Button(
                 "START",
                 swfont,
-                (self.screen_width // 2, self.screen_height * 0.4),
+                (
+                    self.engine.screen_width // 2,
+                    self.engine.screen_height * 0.4,
+                ),
                 1,
                 "yellow",
             )
@@ -94,7 +92,10 @@ class WelcomeMenu:
             Button(
                 "LEADERBOARD",
                 swfont,
-                (self.screen_width // 2, self.screen_height * 0.4 + 50),
+                (
+                    self.engine.screen_width // 2,
+                    self.engine.screen_height * 0.4 + 50,
+                ),
                 2,
                 "yellow",
             )
@@ -103,7 +104,10 @@ class WelcomeMenu:
             Button(
                 "EXIT",
                 swfont,
-                (self.screen_width // 2, self.screen_height * 0.4 + 100),
+                (
+                    self.engine.screen_width // 2,
+                    self.engine.screen_height * 0.4 + 100,
+                ),
                 3,
                 "yellow",
             )
@@ -112,7 +116,10 @@ class WelcomeMenu:
             Button(
                 "music",
                 self.music_state,
-                (self.screen_width * 0.3, self.screen_height * 0.9),
+                (
+                    self.engine.screen_width * 0.3,
+                    self.engine.screen_height * 0.9,
+                ),
                 4,
                 "",
             )
@@ -121,7 +128,10 @@ class WelcomeMenu:
             Button(
                 "color",
                 "./assets/color.png",
-                (self.screen_width * 0.7, self.screen_height * 0.9),
+                (
+                    self.engine.screen_width * 0.7,
+                    self.engine.screen_height * 0.9,
+                ),
                 5,
                 "",
             )
@@ -163,13 +173,17 @@ class WelcomeMenu:
                 + Vector2(-15, 0),
             )
         )
-        self.assets.add(Wall(5, self.screen_height, (0, 0), "white", "frame"))
-        self.assets.add(Wall(self.screen_width, 5, (0, 0), "white", "frame"))
+        self.assets.add(
+            Wall(5, self.engine.screen_height, (0, 0), "white", "frame")
+        )
+        self.assets.add(
+            Wall(self.engine.screen_width, 5, (0, 0), "white", "frame")
+        )
         self.assets.add(
             Wall(
-                self.screen_width,
+                self.engine.screen_width,
                 5,
-                (0, self.screen_height - 5),
+                (0, self.engine.screen_height - 5),
                 "white",
                 "frame",
             )
@@ -177,8 +191,8 @@ class WelcomeMenu:
         self.assets.add(
             Wall(
                 5,
-                self.screen_height,
-                (self.screen_width - 5, 0),
+                self.engine.screen_height,
+                (self.engine.screen_width - 5, 0),
                 "white",
                 "frame",
             )

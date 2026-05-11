@@ -29,10 +29,10 @@ class Engine:
         self.clock = pygame.time.Clock()
         self.leaderboard = Leaderboard()
         self.menu = Menu(
-            self.screen,
-            self.screen_width,
-            self.screen_height,
-            self.leaderboard,
+            self,
+            # self.screen,
+            # self.screen_width,
+            # self.screen_height,
         )
         self.game = Game(
             self,
@@ -103,7 +103,7 @@ class Engine:
 
         while self.running:
             if self.menu_active:
-                self.menu.show(self.screen_width, self.screen_height)
+                self.menu.show()
             else:
                 self.game.update()
             self.event()

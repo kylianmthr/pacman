@@ -1,13 +1,11 @@
 import pygame
 from pygame.math import Vector2
 from src.menu_sprites import Button, Picture, Text, TextFromRight, TextFromLeft
-from src.models import HighScore, Player
-from pathlib import Path
 from src.wall import Wall
-from src.leaderboard import Leaderboard
 
 
-class LeaderBoardMenu:
+
+class GameOverMenu:
     def __init__(self, engine):
         self.engine = engine
         pygame.font.init()
