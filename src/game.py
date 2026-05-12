@@ -17,6 +17,8 @@ class Game:
         points_per_pacgum,
         points_per_super_pacgum,
         points_per_ghost,
+        lives,
+        level_max_time,
     ) -> None:
         from src.game_sprites import (
             Player,
@@ -31,9 +33,9 @@ class Game:
         from src.timer import Timer
 
         self.engine = engine
-        self.lives = 3
-        self.pause_menu = PauseMenu(self, screen)
-        self.timer = Timer(90)
+        self.lives = lives
+        self.pause_menu = PauseMenu(self.engine)
+        self.timer = Timer(level_max_time)
         self.hud = HUD(self, self.engine)
         self.width = width
         self.height = height
@@ -66,6 +68,8 @@ class Game:
         self.walls = pygame.sprite.Group()
         self.pacgums = pygame.sprite.Group()
         self.superpacgums = pygame.sprite.Group()
+        self.create_walls()
+        self.create_pacgums()
         for ghost in ghosts:
             self.ghosts.add(ghost)
             self.sprites.add(ghost)
@@ -175,6 +179,9 @@ class Game:
                 player.disered_direction = Direction.EAST
             if event.key == pygame.K_ESCAPE:
                 self.timer.toggle_pause()
+            if self.timer.paused:
+                if event.key == pygame.K_RETURN:
+                    self.engine.running = False
 
     def update(self) -> None:
         self.sprites.update()

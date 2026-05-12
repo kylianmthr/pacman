@@ -1,8 +1,8 @@
 {
     "best_players": [
         {
-            "name": "kylian",
-            "score": 200
+            "name": "10  chars",
+            "score": 10000000
         },
         {
             "name": "kylian",
@@ -18,27 +18,27 @@
         },
         {
             "name": "kylian",
-            "score": 0
+            "score": 200
         },
         {
             "name": "youl",
-            "score": 0
-        },
-        {
-            "name": "youl",
-            "score": 0
-        },
-        {
-            "name": "youl",
-            "score": 0
+            "score": 175
         },
         {
             "name": "youl",
             "score": 56
         },
         {
-            "name": "10  chars",
-            "score": 10000000
+            "name": "youl",
+            "score": 30
+        },
+        {
+            "name": "kylian",
+            "score": 0
+        },
+        {
+            "name": "youl",
+            "score": 0
         }
     ]
 }

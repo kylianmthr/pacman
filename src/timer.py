@@ -34,4 +34,4 @@ class Timer:
         return self.get_elapsed_time() >= self.duration
 
     def current_time(self):
-        return 90 - self.get_elapsed_time() // 1000
+        return self.duration // 1000 - self.get_elapsed_time() // 1000

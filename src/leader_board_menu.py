@@ -26,13 +26,11 @@ class LeaderBoardMenu:
         sprite.rect = sprite.image.get_rect(center=coordinates)
 
     def create_static_surfaces(self):
-        pacfont = pygame.font.Font("./assets/PAC-FONT.TTF", 35)
-        pixelmania = pygame.font.Font("./assets/Pixelmania.ttf", 15)
         self.assets.add(
             Text(
                 "1              9",
                 "yellow",
-                pacfont,
+                self.root_menu.pacfont,
                 (
                     self.engine.screen_width // 2,
                     self.engine.screen_height * 0.1,
@@ -43,7 +41,7 @@ class LeaderBoardMenu:
             Text(
                 "PACMAN",
                 "yellow",
-                pacfont,
+                self.root_menu.pacfont,
                 (
                     self.engine.screen_width // 2,
                     self.engine.screen_height * 0.1,
@@ -54,7 +52,7 @@ class LeaderBoardMenu:
             Text(
                 "22222222222222",
                 "yellow",
-                pacfont,
+                self.root_menu.pacfont,
                 (
                     self.engine.screen_width // 2,
                     self.engine.screen_height * 0.1 + 40,
@@ -65,7 +63,7 @@ class LeaderBoardMenu:
         self.assets.add(
             Button(
                 "RETURN",
-                pixelmania,
+                self.root_menu.pixelmania,
                 (
                     self.engine.screen_width // 2,
                     self.engine.screen_height * 0.27,

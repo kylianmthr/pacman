@@ -1,39 +1,61 @@
 import pygame
-from src.game import Game
-from src.menu_sprites import Box, Text
+from pygame import Vector2
+from src.menu_sprites import Box, Text, Button, Picture
 
 
 class PauseMenu:
-    def __init__(self, game: Game, screen):
-        self.game = game
-        self.screen = screen
-        self.sprites = pygame.sprite.Group()
+    def __init__(self, engine):
+        self.engine = engine
+        self.assets = pygame.sprite.Group()
         pixelmania = pygame.font.Font("./assets/Pixelmania.ttf", 15)
-        self.sprites.add(
+        self.assets.add(
             Box(
-                self.game.engine.screen_width * 3,
-                self.game.engine.screen_height * 3,
+                self.engine.screen_width * 3,
+                self.engine.screen_height * 3,
                 (0, 0),
                 200,
             )
         )
-        self.sprites.add(
+        self.assets.add(
             Text(
                 "PAUSED",
                 "yellow",
                 pixelmania,
                 (
-                    self.game.engine.screen_width // 2,
-                    self.game.engine.screen_height // 2 - 50,
+                    self.engine.screen_width // 2,
+                    (self.engine.screen_height * 0.48) - 50,
                 ),
             )
         )
-
-    def evt(self, events):
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.game.timer.toggle_pause()
+        return_button = Button(
+            "RETURN",
+            pixelmania,
+            (
+                self.engine.screen_width // 2,
+                self.engine.screen_height * 0.48,
+            ),
+            1,
+            "white",
+        )
+        self.assets.add(return_button)
+        self.assets.add(
+            Picture(
+                "right_selector",
+                "./assets/pacman_right.png",
+                20,
+                20,
+                (Vector2(return_button.rect.midright) + Vector2(15, 0)),
+            )
+        )
+        self.assets.add(
+            Picture(
+                "left_selector",
+                "./assets/pacman_left.png",
+                20,
+                20,
+                (Vector2(return_button.rect.midleft) + Vector2(-15, 0)),
+            )
+        )
 
     def draw(self):
-        self.sprites.draw(self.screen)
+        self.assets.draw(self.engine.screen)
