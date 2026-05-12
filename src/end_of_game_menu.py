@@ -1,16 +1,13 @@
 import pygame
 
-from src.menu_sprites import (
-    Text,
-    Box,
-)
+from src.menu_sprites import Text, Box, Picture
 from src.models import Player
 
 
 class EndOfGameMenu:
     def __init__(self, engine, type, root_menu):
         self.root_menu = root_menu
-        self.player_name = ""
+        self.player_name = "|"
         self.player_name_display = None
         self.type = type
         self.engine = engine
@@ -51,30 +48,19 @@ class EndOfGameMenu:
                 ),
             )
         )
-        self.assets.add(
-            Text(
-                "Enter your name :",
-                "white",
-                self.root_menu.montserrat,
-                (
-                    self.engine.screen_width // 2,
-                    self.engine.screen_height * 0.7,
-                ),
-            ),
-        )
+        # self.assets.add(
+        #     Box(
+        #         350,
+        #         70,
+        #         (
+        #             self.engine.screen_width // 2,
+        #             self.engine.screen_height * 0.75,
+        #         ),
+        #         500,
+        #         "yellow",
+        #     )
+        # )
 
-        self.assets.add(
-            Box(
-                200,
-                20,
-                (
-                    self.engine.screen_width // 2,
-                    self.engine.screen_height * 0.8,
-                ),
-                500,
-                "white",
-            )
-        )
         if self.type == "game_over":
             self.assets.add(
                 Text(
@@ -114,33 +100,44 @@ class EndOfGameMenu:
             self.root_menu.montserrat,
             (
                 self.engine.screen_width // 2,
-                self.engine.screen_height * 0.8,
+                self.engine.screen_height * 0.65 + 60,
             ),
         )
         self.assets.add(self.player_name_display)
+        self.assets.add(
+            Text(
+                "ENTER YOUR NAME",
+                "yellow",
+                self.root_menu.pixelmania,
+                (
+                    self.engine.screen_width // 2,
+                    self.engine.screen_height * 0.65,
+                ),
+            ),
+        )
 
     def display_score(self):
         if self.engine.score > 9999999999999:
             self.assets.add(
                 Text(
                     "Maximum score",
-                    "white",
+                    "yellow",
                     self.root_menu.montserrat,
                     (
                         self.engine.screen_width // 2,
-                        self.engine.screen_height * 0.6,
+                        self.engine.screen_height * 0.65 + 30,
                     ),
                 ),
             )
         else:
             self.assets.add(
                 Text(
-                    f"your score is {self.engine.score} points",
-                    "white",
+                    f"{self.engine.score} points",
+                    "yellow",
                     self.root_menu.montserrat,
                     (
                         self.engine.screen_width // 2,
-                        self.engine.screen_height * 0.6,
+                        self.engine.screen_height * 0.65 + 30,
                     ),
                 ),
             )
@@ -155,7 +152,7 @@ class EndOfGameMenu:
 
     def write_player_score(self):
         self.player_name_display.image = self.root_menu.montserrat.render(
-            self.player_name, True, "black", None
+            self.player_name, True, "yellow", None
         )
         self.player_name_display.rect = (
             self.player_name_display.image.get_rect(
@@ -166,14 +163,23 @@ class EndOfGameMenu:
     def event(self, event) -> bool:
         if (event.unicode.isalnum() or event.unicode == " ") and len(
             self.player_name
-        ) < 10:
-            self.player_name = self.player_name + event.unicode
+        ) < 11:
+            self.player_name = (
+                self.player_name[: len(self.player_name) - 1]
+                + event.unicode
+                + "|"
+            )
             self.write_player_score()
             self.show()
         if event.key == 8 and len(self.player_name) > 0:
-            self.player_name = self.player_name[: len(self.player_name) - 1]
+            self.player_name = (
+                self.player_name[: len(self.player_name) - 2] + "|"
+            )
         if event.key == pygame.K_RETURN and len(self.player_name) > 0:
             self.engine.leaderboard.rank_player(
-                Player(name=self.player_name, score=self.engine.score)
+                Player(
+                    name=self.player_name[: len(self.player_name) - 1],
+                    score=self.engine.score,
+                )
             )
             self.engine.running = False

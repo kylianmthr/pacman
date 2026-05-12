@@ -1,20 +1,17 @@
 import pygame
 from pygame import Vector2
-from src.game import Game
 from src.menu_sprites import Box, Text, Button, Picture
 
 
 class PauseMenu:
-    def __init__(self, game: Game, engine):
-        self.game = game
+    def __init__(self, engine):
         self.engine = engine
         self.assets = pygame.sprite.Group()
         pixelmania = pygame.font.Font("./assets/Pixelmania.ttf", 15)
-        print(self.game.engine.screen_width, self.game.engine.screen_height)
         self.assets.add(
             Box(
-                self.game.engine.screen_width * 3,
-                self.game.engine.screen_height * 3,
+                self.engine.screen_width * 3,
+                self.engine.screen_height * 3,
                 (0, 0),
                 200,
             )
@@ -25,9 +22,8 @@ class PauseMenu:
                 "yellow",
                 pixelmania,
                 (
-                    self.game.engine.screen_width // 2,
-                    (self.game.engine.screen_height * 0.48) - 50,
-                    
+                    self.engine.screen_width // 2,
+                    (self.engine.screen_height * 0.48) - 50,
                 ),
             )
         )

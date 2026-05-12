@@ -1,7 +1,7 @@
 import pygame
 from pygame import mixer
 from pygame.math import Vector2
-from src.menu_sprites import Button, Picture
+from src.menu_sprites import Button, Picture, Box, Text
 from src.wall import Wall
 
 
@@ -62,7 +62,6 @@ class WelcomeMenu:
         self.update_cursor()
 
     def create_static_surfaces(self):
-        # self.root_menu.pixelmania = pygame.font.Font("./assets/self.root_menu.Pixelmania.ttf", 15)
         self.assets.add(
             Picture(
                 "logo",
@@ -83,7 +82,7 @@ class WelcomeMenu:
                 self.root_menu.pixelmania,
                 (
                     self.engine.screen_width // 2,
-                    self.engine.screen_height * 0.4,
+                    self.engine.screen_height * 0.35,
                 ),
                 1,
                 "yellow",
@@ -95,9 +94,21 @@ class WelcomeMenu:
                 self.root_menu.pixelmania,
                 (
                     self.engine.screen_width // 2,
-                    self.engine.screen_height * 0.4 + 50,
+                    self.engine.screen_height * 0.35 + 50,
                 ),
                 2,
+                "yellow",
+            )
+        )
+        self.assets.add(
+            Button(
+                "HELP",
+                self.root_menu.pixelmania,
+                (
+                    self.engine.screen_width // 2,
+                    self.engine.screen_height * 0.35 + 100,
+                ),
+                3,
                 "yellow",
             )
         )
@@ -107,7 +118,7 @@ class WelcomeMenu:
                 self.root_menu.pixelmania,
                 (
                     self.engine.screen_width // 2,
-                    self.engine.screen_height * 0.4 + 100,
+                    self.engine.screen_height * 0.35 + 150,
                 ),
                 3,
                 "yellow",
@@ -225,6 +236,8 @@ class WelcomeMenu:
                     self.engine.music.ghost_sound_effect()
             elif self.buttons[self.button_idx].name == "LEADERBOARD":
                 self.root_menu.switch_menu("leaderboard")
+            elif self.buttons[self.button_idx].name == "HELP":
+                self.root_menu.switch_menu("help_menu")
             elif self.buttons[self.button_idx].name == "EXIT":
                 self.engine.running = False
                 self.engine.quit = True
