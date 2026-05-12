@@ -72,6 +72,7 @@ class Game:
         self.sprites.add(self.hud.score)
         self.sprites.add(self.hud.lives)
         self.sprites.add(self.hud.timer)
+        self.sprites.add(self.hud.level)
         self.create_walls()
         self.create_pacgums()
         self.points_per_pacgum = points_per_pacgum
@@ -182,7 +183,7 @@ class Game:
         if len(self.pacgums.sprites()) == 0 and not self.engine.loading:
             self.engine.loading = True
             self.engine.next_level()
-        if self.lives < 0 or self.timer.is_expired():
+        if self.lives <= 0 or self.timer.is_expired():
             self.engine.menu_active = True
             self.engine.menu.switch_menu("game_over_menu")
             mixer.music.stop()

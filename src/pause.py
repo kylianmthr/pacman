@@ -9,7 +9,6 @@ class PauseMenu:
         self.screen = screen
         self.sprites = pygame.sprite.Group()
         pixelmania = pygame.font.Font("./assets/Pixelmania.ttf", 15)
-        print(self.game.engine.screen_width, self.game.engine.screen_height)
         self.sprites.add(
             Box(
                 self.game.engine.screen_width * 3,
