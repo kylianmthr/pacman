@@ -20,6 +20,7 @@ class Game:
         points_per_ghost,
         lives,
         level_max_time,
+        pacgum,
     ) -> None:
         from src.game_sprites import (
             Player,
@@ -68,6 +69,7 @@ class Game:
         self.sprites.add(self.player)
         self.walls = pygame.sprite.Group()
         self.pacgums = pygame.sprite.Group()
+        self.pacgum = pacgum
         self.superpacgums = pygame.sprite.Group()
         self.create_walls()
         self.create_pacgums()
@@ -120,6 +122,19 @@ class Game:
         offset_y = 23
         y = 0
         superpacugums = self.get_superpacgum()
+        cells = [
+            (row, col)
+            for row in range(len(self.maze.maze))
+            for col in range(len(self.maze.maze[0]))
+        ]
+        for cell in superpacugums:
+            if cell in cells:
+                cells.remove(cell)
+        for cell in self.maze.forty_two_cell:
+            if cell in cells:
+                cells.remove(cell)
+        cells = random.sample(cells, self.pacgum)
+
         for row in self.maze.maze:
             x = 0
             offset_x = 23
@@ -129,7 +144,7 @@ class Game:
                         pacgum = Pacgum(5, (offset_x, offset_y))
                         self.superpacgums.add(pacgum)
                         self.sprites.add(pacgum)
-                    else:
+                    elif self.pacgum == 0 or (x, y) in cells:
                         pacgum = Pacgum(2, (offset_x, offset_y))
                         self.pacgums.add(pacgum)
                         self.sprites.add(pacgum)
