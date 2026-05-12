@@ -1,37 +1,43 @@
 import pygame
 from src.engine import Engine
 from src.game import Game
-from src.menu_sprites import Text
+from src.menu_sprites import TextFromLeft
 
 
 class HUD:
     def __init__(self, game: Game, engine: Engine):
         self.game = game
         self.engine = engine
-        self.arcade_font = pygame.font.Font("./assets/ARCADE_I.TTF", 20)
+        self.arcade_font = pygame.font.Font("./assets/Pixelmania.ttf", 10)
         self.score = self.Score(
             self,
-            str(self.engine.score),
+            f"SCORE  {str(self.engine.score)}",
             "white",
             self.arcade_font,
-            (20, self.engine.screen_height - 15),
+            (10, self.engine.screen_height - 15),
         )
         self.lives = self.Lives(
             self,
-            str(self.game.lives),
+            f"LIVES  {str(self.game.lives)}",
             "white",
             self.arcade_font,
-            (90, self.engine.screen_height - 15),
+            (
+                self.score.get_size()[0] + 5 * 2,
+                self.engine.screen_height - 15,
+            ),
         )
         self.timer = self.Timer(
             self,
-            str(self.game.timer.current_time()),
+            f"TIMER  {str(self.game.timer.current_time())}",
             "white",
             self.arcade_font,
-            (160, self.engine.screen_height - 15),
+            (
+                self.score.get_size()[0] + self.lives.get_size()[0] + 10 * 4,
+                self.engine.screen_height - 15,
+            ),
         )
 
-    class Score(Text):
+    class Score(TextFromLeft):
         def __init__(
             self,
             hud: "HUD",
@@ -44,10 +50,12 @@ class HUD:
             self.hud = hud
 
         def update(self):
-            self.text = str(self.hud.engine.score)
+            score = self.hud.engine.score
+            self.text = f"SCORE  {str(score) if score <= 9999 else '9999'}"
+            print(self.text)
             self.image = self.font.render(self.text, True, self.color)
 
-    class Lives(Text):
+    class Lives(TextFromLeft):
         def __init__(
             self,
             hud: "HUD",
@@ -60,10 +68,11 @@ class HUD:
             self.hud = hud
 
         def update(self):
-            self.text = str(self.hud.game.lives)
+            self.text = f"LIVES  {str(self.hud.game.lives)}"
+            self.rect.x = self.hud.score.get_size()[0] + 10 * 2
             self.image = self.font.render(self.text, True, self.color)
 
-    class Timer(Text):
+    class Timer(TextFromLeft):
         def __init__(
             self,
             hud: "HUD",
@@ -76,5 +85,10 @@ class HUD:
             self.hud = hud
 
         def update(self):
-            self.text = str(self.hud.game.timer.current_time())
+            self.text = f"TIMER  {str(self.hud.game.timer.current_time())}"
+            self.rect.x = (
+                self.hud.score.get_size()[0]
+                + self.hud.lives.get_size()[0]
+                + 10 * 3
+            )
             self.image = self.font.render(self.text, True, self.color)

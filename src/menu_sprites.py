@@ -48,7 +48,8 @@ class Text(pygame.sprite.Sprite):
         self.name = text
         self.color = color
         self.font = font
-        self.image = self.font.render(text, True, color, None)
+        self.text = text
+        self.image = self.font.render(self.text, True, color, None)
         self.rect = self.image.get_rect(center=coordinates)
 
 
@@ -78,10 +79,14 @@ class TextFromLeft(pygame.sprite.Sprite):
     ):
         super().__init__()
         self.name = text
+        self.text = text
         self.color = color
         self.font = font
-        self.image = self.font.render(text, True, color, None)
+        self.image = self.font.render(self.text, True, color, None)
         self.rect = self.image.get_rect(midleft=coordinates)
+
+    def get_size(self):
+        return self.font.size(self.text)
 
 
 class Picture(pygame.sprite.Sprite):
