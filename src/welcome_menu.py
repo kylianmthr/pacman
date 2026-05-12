@@ -1,11 +1,13 @@
 import pygame
+from pygame import mixer
 from pygame.math import Vector2
 from src.menu_sprites import Button, Picture
 from src.wall import Wall
 
 
 class WelcomeMenu:
-    def __init__(self, engine):
+    def __init__(self, engine, root_menu):
+        self.root_menu = root_menu
         pygame.font.init()
         self.engine = engine
         self.assets = pygame.sprite.Group()
@@ -61,7 +63,7 @@ class WelcomeMenu:
         self.update_cursor()
 
     def create_static_surfaces(self):
-        swfont = pygame.font.Font("./assets/Pixelmania.ttf", 15)
+        pixelmania = pygame.font.Font("./assets/Pixelmania.ttf", 15)
         self.assets.add(
             Picture(
                 "logo",
@@ -79,7 +81,7 @@ class WelcomeMenu:
         self.assets.add(
             Button(
                 "START",
-                swfont,
+                pixelmania,
                 (
                     self.engine.screen_width // 2,
                     self.engine.screen_height * 0.4,
@@ -91,7 +93,7 @@ class WelcomeMenu:
         self.assets.add(
             Button(
                 "LEADERBOARD",
-                swfont,
+                pixelmania,
                 (
                     self.engine.screen_width // 2,
                     self.engine.screen_height * 0.4 + 50,
@@ -103,7 +105,7 @@ class WelcomeMenu:
         self.assets.add(
             Button(
                 "EXIT",
-                swfont,
+                pixelmania,
                 (
                     self.engine.screen_width // 2,
                     self.engine.screen_height * 0.4 + 100,
@@ -210,19 +212,22 @@ class WelcomeMenu:
             "brown",
             "orange",
         ]
-        current = (colors.index(self.frame_color) + 1) % len(colors)
+        current = (colors.index(self.engine.color) + 1) % len(colors)
+        self.engine.color = colors[current]
+        self.engine.change_wall_color()
         for frame in frames:
-            self.frame_color = colors[current]
-            frame.image.fill(colors[current])
+            frame.image.fill(self.engine.color)
 
     def event(self, event) -> str:
         if event.key == pygame.K_RETURN:
             if self.buttons[self.button_idx].name == "START":
-                return "start"
+                self.engine.menu_active = False
+                if self.engine.music_active:
+                    self.engine.music.ghost_sound_effect()
             elif self.buttons[self.button_idx].name == "LEADERBOARD":
-                return "leaderboard"
+                self.root_menu.switch_menu("leaderboard")
             elif self.buttons[self.button_idx].name == "EXIT":
-                return "exit"
+                self.engine.running = False
             elif self.buttons[self.button_idx].name == "music":
                 if self.music_state == "./assets/music_on.png":
                     self.music_state = "./assets/music_off.png"
@@ -232,17 +237,14 @@ class WelcomeMenu:
                     if sprite.name == "music":
                         self.update_sprite_file_path(sprite, self.music_state)
                 if self.music_state == "./assets/music_on.png":
-                    return "music_on"
+                    self.engine.music_active = True
+                    self.engine.music.start_music()
                 else:
-                    return "music_off"
+                    self.engine.music_active = False
+                    mixer.music.stop()
             elif self.buttons[self.button_idx].name == "color":
                 self.change_color_frame()
-                return self.frame_color
-            else:
-                return ""
-
         if event.key in (pygame.K_UP, pygame.K_w):
             self.item_selection(-1)
         elif event.key in (pygame.K_DOWN, pygame.K_s):
             self.item_selection(+1)
-        return ""

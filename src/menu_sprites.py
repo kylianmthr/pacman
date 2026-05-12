@@ -44,6 +44,7 @@ class Text(pygame.sprite.Sprite):
         coordinates: tuple[int, int],
     ):
         super().__init__()
+        self.coordinates = coordinates
         self.name = text
         self.color = color
         self.font = font
@@ -101,20 +102,17 @@ class Picture(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=coordinates)
 
 
-class Rectangle(pygame.sprite.Sprite):
+class Box(pygame.sprite.Sprite):
     def __init__(
         self,
-        name: str,
-        color: str,
-        left: str,
-        top: str,
         width: int,
         height: int,
         coordinates: tuple[int, int],
-    ):
-        super().__init__()
-        self.name = name
-        self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        color: str = "white",
+        name="box",
+    ) -> None:
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((width, height))
         self.image.fill(color)
-        self.image = pygame.Rect((left, top, width, height))
-        self.rect = self.image.get_rect(topleft=coordinates)
+        self.rect = self.image.get_rect(center=coordinates)
+        self.name = name

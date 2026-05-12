@@ -4,7 +4,7 @@ from src.pacgum import Pacgum
 from src.timer import Timer
 from src.wall import Wall
 from mazegen import generator
-import random
+from pygame import mixer
 
 
 class Game:
@@ -179,5 +179,6 @@ class Game:
             self.engine.loading = True
             self.engine.next_level()
         if self.lives < 0 or self.timer.is_expired():
-            # Le game over
-            pass
+            self.engine.menu_active = True
+            self.engine.menu.switch_menu("game_over_menu")
+            mixer.music.stop()

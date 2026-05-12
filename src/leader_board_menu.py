@@ -1,14 +1,12 @@
 import pygame
 from pygame.math import Vector2
 from src.menu_sprites import Button, Picture, Text, TextFromRight, TextFromLeft
-from src.models import HighScore, Player
-from pathlib import Path
 from src.wall import Wall
-from src.leaderboard import Leaderboard
 
 
 class LeaderBoardMenu:
-    def __init__(self, engine):
+    def __init__(self, engine, root_menu):
+        self.root_menu = root_menu
         self.engine = engine
         pygame.font.init()
         self.assets = pygame.sprite.Group()
@@ -23,10 +21,6 @@ class LeaderBoardMenu:
         self.engine.screen.fill("black")
         self.assets.draw(self.engine.screen)
 
-    def stop_menu(self):
-        for sprite in self.assets:
-            sprite.kill()
-
     def update_sprite(
         self, sprite: pygame.sprite.Sprite, coordinates: tuple[int, int]
     ):
@@ -34,7 +28,7 @@ class LeaderBoardMenu:
 
     def create_static_surfaces(self):
         pacfont = pygame.font.Font("./assets/PAC-FONT.TTF", 35)
-        swfont = pygame.font.Font("./assets/Pixelmania.ttf", 15)
+        pixelmania = pygame.font.Font("./assets/Pixelmania.ttf", 15)
         self.assets.add(
             Text(
                 "1              9",
@@ -72,7 +66,7 @@ class LeaderBoardMenu:
         self.assets.add(
             Button(
                 "RETURN",
-                swfont,
+                pixelmania,
                 (
                     self.engine.screen_width // 2,
                     self.engine.screen_height * 0.27,
@@ -142,12 +136,12 @@ class LeaderBoardMenu:
             )
         )
 
-    def update_leaderboard_surfaces(self, frame_color):
+    def update_leaderboard_surfaces(self):
         [pygame.sprite.Sprite.kill(asset) for asset in self.assets]
         self.create_static_surfaces()
         self.engine.leaderboard.data_retriever()
-        superfunnel = pygame.font.Font("./assets/SuperFunnel.ttf", 25)
-        karma_future = pygame.font.Font("./assets/KarmaFuture.ttf", 25)
+        superfunnel = pygame.font.Font("./assets/SuperFunnel.ttf", 20)
+        karma_future = pygame.font.Font("./assets/KarmaFuture.ttf", 20)
         coordinate_player_name = Vector2(
             self.engine.screen_width * 0.05, self.engine.screen_height * 0.3
         )
@@ -156,8 +150,8 @@ class LeaderBoardMenu:
         )
         for player in self.engine.leaderboard.high_scores.best_players:
             if player.score > 0:
-                coordinate_player_name += Vector2(0, 30)
-                coordinate_player_score += Vector2(0, 30)
+                coordinate_player_name += Vector2(0, 28)
+                coordinate_player_score += Vector2(0, 28)
                 self.assets.add(
                     TextFromLeft(
                         f"{player.name}",
@@ -186,13 +180,8 @@ class LeaderBoardMenu:
                     )
         frames = [frame for frame in self.assets if frame.name == "frame"]
         for frame in frames:
-            frame.image.fill(frame_color)
-
-    # def data_retriever(self):
-    #     with open("high_scores.json", "r") as file:
-    #         self.high_scores = HighScore.model_validate_json(file.read())
+            frame.image.fill(self.engine.color)
 
     def event(self, event) -> bool:
         if event.key == pygame.K_RETURN:
-            return "return"
-        return ""
+            self.root_menu.switch_menu("welcome_menu")
