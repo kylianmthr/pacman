@@ -18,10 +18,6 @@ class WelcomeMenu:
         self.cursors_map = {}
         self.create_static_surfaces()
 
-    def stop_menu(self):
-        for sprite in self.assets:
-            sprite.kill()
-
     def show(self):
         self.engine.screen.fill("black")
         self.assets.draw(self.engine.screen)
@@ -216,7 +212,6 @@ class WelcomeMenu:
             "brown",
             "orange",
         ]
-        print(colors.index(self.engine.color))
         current = (colors.index(self.engine.color) + 1) % len(colors)
         self.engine.color = colors[current]
         self.engine.change_wall_color()
@@ -226,7 +221,6 @@ class WelcomeMenu:
     def event(self, event) -> str:
         if event.key == pygame.K_RETURN:
             if self.buttons[self.button_idx].name == "START":
-                print("ok")
                 self.engine.menu_active = False
                 if self.engine.music_active:
                     self.engine.music.ghost_sound_effect()
