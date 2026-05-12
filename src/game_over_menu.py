@@ -19,6 +19,7 @@ class EndOfGameMenu:
         self.create_static_surfaces()
 
     def create_static_surfaces(self):
+        # Peut etre deplacer ca dans la class menu principal
         pacfont = pygame.font.Font("./assets/PAC-FONT.TTF", 35)
         montserrat = pygame.font.Font("./assets/montserrat.ttf", 15)
         self.assets.add(
