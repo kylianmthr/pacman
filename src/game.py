@@ -170,6 +170,8 @@ class Game:
                 player.disered_direction = Direction.NORTH
             if event.key == pygame.K_RIGHT:
                 player.disered_direction = Direction.EAST
+            if event.key == pygame.K_ESCAPE:
+                self.timer.toggle_pause()
 
     def update(self) -> None:
         self.sprites.update()
