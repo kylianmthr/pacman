@@ -52,7 +52,6 @@ class HUD:
         def update(self):
             score = self.hud.engine.score
             self.text = f"SCORE  {str(score) if score <= 9999 else '9999'}"
-            print(self.text)
             self.image = self.font.render(self.text, True, self.color)
 
     class Lives(TextFromLeft):
