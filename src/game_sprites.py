@@ -329,7 +329,8 @@ class Ghost(ABC, GameSprite):
                 Direction.NORTH: (0, 1),
                 Direction.EAST: (0, 1),
                 Direction.WEST: (0, 1),
-            }
+            },
+            1,
         )
 
     def scatter_cycle(self):
