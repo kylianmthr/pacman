@@ -165,6 +165,7 @@ class EndOfGameMenu:
             )
 
     def event(self, event) -> bool:
+        #TODO: Si y'a un bug sur la taille faut fix ici
         if (event.unicode.isalnum() or event.unicode == " ") and len(
             self.player_name
         ) < 10:
