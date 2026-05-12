@@ -71,6 +71,8 @@ class EndOfGameMenu:
                     self.engine.screen_width // 2,
                     self.engine.screen_height * 0.8,
                 ),
+                500,
+                "white",
             )
         )
         if self.type == "game_over":
