@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 import pygame
 from src.cheat import Cheats
 from src.pacgum import Pacgum

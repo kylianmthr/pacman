@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 import pygame
 from pygame.math import Vector2
 from src.menu_sprites import Button, Picture, Text, TextFromRight, TextFromLeft

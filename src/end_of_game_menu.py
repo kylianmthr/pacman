@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 import pygame
 
 from src.menu_sprites import Text

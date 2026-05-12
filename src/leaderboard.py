@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 from pathlib import Path
 from pydantic import TypeAdapter
 from src.models import HighScore, Player

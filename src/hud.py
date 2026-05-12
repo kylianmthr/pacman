@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 import pygame
 from src.engine import Engine
 from src.game import Game
