@@ -34,7 +34,7 @@ class Game:
 
         self.engine = engine
         self.lives = lives
-        self.pause_menu = PauseMenu(self, self.engine)
+        self.pause_menu = PauseMenu(self.engine)
         self.timer = Timer(level_max_time)
         self.hud = HUD(self, self.engine)
         self.width = width
