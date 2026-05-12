@@ -1,13 +1,12 @@
-# mypy: ignore-errors
 import pygame
-from pygame import Vector2
+from typing import Any
 from src.menu_sprites import Box, Text, Button, Picture
 
 
 class PauseMenu:
-    def __init__(self, engine):
+    def __init__(self, engine: Any) -> None:
         self.engine = engine
-        self.assets = pygame.sprite.Group()
+        self.assets: Any = pygame.sprite.Group()
         pixelmania = pygame.font.Font("./assets/Pixelmania.ttf", 15)
         self.assets.add(
             Box(
@@ -45,7 +44,10 @@ class PauseMenu:
                 "./assets/pacman_right.png",
                 20,
                 20,
-                (Vector2(return_button.rect.midright) + Vector2(15, 0)),
+                (
+                    int(return_button.rect.midright[0] + 15),
+                    int(return_button.rect.midright[1]),
+                ),
             )
         )
         self.assets.add(
@@ -54,9 +56,12 @@ class PauseMenu:
                 "./assets/pacman_left.png",
                 20,
                 20,
-                (Vector2(return_button.rect.midleft) + Vector2(-15, 0)),
+                (
+                    int(return_button.rect.midleft[0] - 15),
+                    int(return_button.rect.midleft[1]),
+                ),
             )
         )
 
-    def draw(self):
+    def draw(self) -> None:
         self.assets.draw(self.engine.screen)

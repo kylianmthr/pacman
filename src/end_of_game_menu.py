@@ -1,21 +1,21 @@
-# mypy: ignore-errors
 import pygame
+from typing import Any
 
 from src.menu_sprites import Text
 from src.models import Player
 
 
 class EndOfGameMenu:
-    def __init__(self, engine, type, root_menu):
+    def __init__(self, engine: Any, type: str, root_menu: Any) -> None:
         self.root_menu = root_menu
         self.player_name = "|"
-        self.player_name_display = None
+        self.player_name_display: Text | None = None
         self.type = type
         self.engine = engine
-        self.assets = pygame.sprite.Group()
+        self.assets: Any = pygame.sprite.Group()
         self.create_static_surfaces()
 
-    def create_static_surfaces(self):
+    def create_static_surfaces(self) -> None:
         self.assets.add(
             Text(
                 "1              9",
@@ -117,7 +117,7 @@ class EndOfGameMenu:
             ),
         )
 
-    def display_score(self):
+    def display_score(self) -> None:
         if self.engine.score > 9999999999999:
             self.assets.add(
                 Text(
@@ -145,13 +145,15 @@ class EndOfGameMenu:
 
     def show(
         self,
-    ):
+    ) -> None:
 
         self.engine.screen.fill("black")
         self.write_player_score()
         self.assets.draw(self.engine.screen)
 
-    def write_player_score(self):
+    def write_player_score(self) -> None:
+        if self.player_name_display is None:
+            return
         self.player_name_display.image = self.root_menu.montserrat.render(
             self.player_name, True, "yellow", None
         )
@@ -161,7 +163,7 @@ class EndOfGameMenu:
             )
         )
 
-    def event(self, event) -> bool:
+    def event(self, event: pygame.event.Event) -> None:
         if (event.unicode.isalnum() or event.unicode == " ") and len(
             self.player_name
         ) < 11:

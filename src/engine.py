@@ -1,6 +1,6 @@
-# mypy: ignore-errors
 import pygame
 import os
+from typing import Any, cast
 
 from src.models import Config
 from src.menu import Menu
@@ -55,10 +55,11 @@ class Engine:
         )
         self.music.start_music()
 
-    def change_wall_color(self):
+    def change_wall_color(self) -> None:
         for wall in self.game.walls:
-            wall.color = self.color
-            wall.image.fill(self.color)
+            typed_wall = cast(Any, wall)
+            typed_wall.color = self.color
+            typed_wall.image.fill(self.color)
 
     def next_level(self) -> None:
         if len(self.levels) - 1 == self.level:

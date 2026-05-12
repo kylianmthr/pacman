@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 import pygame
 
 
@@ -9,7 +8,7 @@ class Timer:
         self.accumulated_time = 0
         self.paused = False
 
-    def toggle_pause(self):
+    def toggle_pause(self) -> None:
         if not self.paused:
             self.accumulated_time += pygame.time.get_ticks() - self.start_ticks
             self.paused = True
@@ -17,20 +16,20 @@ class Timer:
             self.start_ticks = pygame.time.get_ticks()
             self.paused = False
 
-    def reset(self):
+    def reset(self) -> None:
         self.start_ticks = pygame.time.get_ticks()
         self.accumulated_time = 0
         self.paused = False
 
-    def get_elapsed_time(self):
+    def get_elapsed_time(self) -> int:
         if self.paused:
             return self.accumulated_time
         return self.accumulated_time + (
             pygame.time.get_ticks() - self.start_ticks
         )
 
-    def is_expired(self):
+    def is_expired(self) -> bool:
         return self.get_elapsed_time() >= self.duration
 
-    def current_time(self):
+    def current_time(self) -> int:
         return self.duration // 1000 - self.get_elapsed_time() // 1000

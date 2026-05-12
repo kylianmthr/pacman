@@ -1,68 +1,68 @@
-# mypy: ignore-errors
 import pygame
 from pygame import mixer
 from pygame.math import Vector2
+from typing import Any, cast
 from src.menu_sprites import Button, Picture
 from src.wall import Wall
 
 
 class WelcomeMenu:
-    def __init__(self, engine, root_menu):
+    def __init__(self, engine: Any, root_menu: Any) -> None:
         self.root_menu = root_menu
         self.engine = engine
-        self.assets = pygame.sprite.Group()
+        self.assets: Any = pygame.sprite.Group()
         self.music_state = "./assets/music_on.png"
         self.frame_color = "white"
-        self.buttons = []
+        self.buttons: list[Button] = []
         self.button_idx = 0
-        self.cursors_map = {}
+        self.cursors_map: dict[str, dict[str, Vector2]] = {}
         self.create_static_surfaces()
 
-    def show(self):
+    def show(self) -> None:
         self.engine.screen.fill("black")
         self.assets.draw(self.engine.screen)
 
     def update_sprite_coordinate(
-        self, sprite: pygame.sprite.Sprite, coordinates: tuple[int, int]
-    ):
+        self, sprite: Any, coordinates: tuple[float, ...]
+    ) -> None:
         sprite.rect = sprite.image.get_rect(center=coordinates)
 
-    def update_sprite_file_path(self, sprite: pygame.sprite.Sprite, path: str):
+    def update_sprite_file_path(self, sprite: Any, path: str) -> None:
         sprite.image = pygame.image.load(self.music_state)
         sprite.image = pygame.transform.smoothscale(
             sprite.image, (sprite.scale_width, sprite.scale_height)
         )
         sprite.rect = sprite.image.get_rect(center=sprite.coordinates)
 
-    def update_cursor(self):
+    def update_cursor(self) -> None:
         for sprite in self.assets:
-            if sprite.name == "right_selector":
+            if cast(Any, sprite).name == "right_selector":
                 self.update_sprite_coordinate(
-                    sprite,
-                    (
+                    cast(Any, sprite),
+                    tuple(
                         self.cursors_map[self.buttons[self.button_idx].name][
                             "right"
                         ]
-                    )
-                    + Vector2(15, 0),
+                        + Vector2(15, 0)
+                    ),
                 )
-            if sprite.name == "left_selector":
+            if cast(Any, sprite).name == "left_selector":
                 self.update_sprite_coordinate(
-                    sprite,
-                    (
+                    cast(Any, sprite),
+                    tuple(
                         self.cursors_map[self.buttons[self.button_idx].name][
                             "left"
                         ]
-                    )
-                    + Vector2(-15, 0),
+                        + Vector2(-15, 0)
+                    ),
                 )
 
-    def item_selection(self, move: int):
+    def item_selection(self, move: int) -> None:
         if len(self.buttons) > 0:
             self.button_idx = (self.button_idx + move) % len(self.buttons)
         self.update_cursor()
 
-    def create_static_surfaces(self):
+    def create_static_surfaces(self) -> None:
         self.assets.add(
             Picture(
                 "logo",
@@ -167,12 +167,17 @@ class WelcomeMenu:
                 20,
                 20,
                 (
-                    (
+                    int(
                         self.cursors_map[self.buttons[self.button_idx].name][
                             "right"
-                        ]
-                    )
-                    + Vector2(15, 0)
+                        ].x
+                        + 15
+                    ),
+                    int(
+                        self.cursors_map[self.buttons[self.button_idx].name][
+                            "right"
+                        ].y
+                    ),
                 ),
             )
         )
@@ -182,8 +187,19 @@ class WelcomeMenu:
                 "./assets/pacman_left.png",
                 20,
                 20,
-                (self.cursors_map[self.buttons[self.button_idx].name]["left"])
-                + Vector2(-15, 0),
+                (
+                    int(
+                        self.cursors_map[self.buttons[self.button_idx].name][
+                            "left"
+                        ].x
+                        - 15
+                    ),
+                    int(
+                        self.cursors_map[self.buttons[self.button_idx].name][
+                            "left"
+                        ].y
+                    ),
+                ),
             )
         )
         self.assets.add(
@@ -211,8 +227,12 @@ class WelcomeMenu:
             )
         )
 
-    def change_color_frame(self) -> str:
-        frames = [frame for frame in self.assets if frame.name == "frame"]
+    def change_color_frame(self) -> None:
+        frames = [
+            frame
+            for frame in self.assets
+            if cast(Any, frame).name == "frame"
+        ]
         colors = [
             "white",
             "blue",
@@ -229,7 +249,7 @@ class WelcomeMenu:
         for frame in frames:
             frame.image.fill(self.engine.color)
 
-    def event(self, event) -> str:
+    def event(self, event: pygame.event.Event) -> None:
         if event.key == pygame.K_RETURN:
             if self.buttons[self.button_idx].name == "START":
                 self.engine.menu_active = False
@@ -248,8 +268,10 @@ class WelcomeMenu:
                 elif self.music_state == "./assets/music_off.png":
                     self.music_state = "./assets/music_on.png"
                 for sprite in self.assets:
-                    if sprite.name == "music":
-                        self.update_sprite_file_path(sprite, self.music_state)
+                    if cast(Any, sprite).name == "music":
+                        self.update_sprite_file_path(
+                            cast(Any, sprite), self.music_state
+                        )
                 if self.music_state == "./assets/music_on.png":
                     self.engine.music_active = True
                     self.engine.music.start_music()

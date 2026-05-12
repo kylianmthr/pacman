@@ -1,4 +1,3 @@
-# mypy: ignore-errors
 import pygame
 from src.cheat import Cheats
 from src.pacgum import Pacgum
@@ -6,22 +5,23 @@ from src.wall import Wall
 from mazegen import generator
 from pygame import mixer
 import random
+from typing import Any, cast
 
 
 class Game:
     def __init__(
         self,
-        engine,
-        screen,
-        width,
-        height,
-        seed,
-        points_per_pacgum,
-        points_per_super_pacgum,
-        points_per_ghost,
-        lives,
-        level_max_time,
-        pacgum,
+        engine: Any,
+        screen: pygame.surface.Surface,
+        width: int,
+        height: int,
+        seed: int,
+        points_per_pacgum: int,
+        points_per_super_pacgum: int,
+        points_per_ghost: int,
+        lives: int,
+        level_max_time: int,
+        pacgum: int,
     ) -> None:
         from src.game_sprites import (
             Player,
@@ -43,8 +43,8 @@ class Game:
         self.width = width
         self.height = height
         self.screen = screen
-        self.sprites = pygame.sprite.Group()
-        self.ghosts = pygame.sprite.Group()
+        self.sprites: Any = pygame.sprite.Group()
+        self.ghosts: Any = pygame.sprite.Group()
         self.player = Player(self, self.engine)
         self.player.rect.x = (self.width - 1) // 2 * 40 + 10
         self.player.rect.y = (self.height - 1) // 2 * 40 + 10
@@ -68,10 +68,10 @@ class Game:
             OrangeGhost(self, (0, 9), (10, (self.height - 1) * 40 + 10)),
         ]
         self.sprites.add(self.player)
-        self.walls = pygame.sprite.Group()
-        self.pacgums = pygame.sprite.Group()
+        self.walls: Any = pygame.sprite.Group()
+        self.pacgums: Any = pygame.sprite.Group()
         self.pacgum = pacgum
-        self.superpacgums = pygame.sprite.Group()
+        self.superpacgums: Any = pygame.sprite.Group()
         self.create_walls()
         self.create_pacgums()
         for ghost in ghosts:
@@ -166,24 +166,25 @@ class Game:
         ]
         for i in range(len(self.ghosts.sprites())):
             current_time = pygame.time.get_ticks()
-            self.ghosts.sprites()[i].rect.x = coords[i][0]
-            self.ghosts.sprites()[i].rect.y = coords[i][1]
-            self.ghosts.sprites()[i].eaten = False
-            self.ghosts.sprites()[i].evade = False
-            self.ghosts.sprites()[i].last_cycle = current_time
-            self.ghosts.sprites()[i].images = []
-            self.ghosts.sprites()[i].set_animation()
-            self.ghosts.sprites()[i].direction = self.ghosts.sprites()[
-                i
-            ].target_player(self.player.get_coordinates())
+            ghost = cast(Any, self.ghosts.sprites()[i])
+            ghost.rect.x = coords[i][0]
+            ghost.rect.y = coords[i][1]
+            ghost.eaten = False
+            ghost.evade = False
+            ghost.last_cycle = current_time
+            ghost.images = []
+            ghost.set_animation()
+            ghost.direction = ghost.target_player(
+                cast(Any, self.player).get_coordinates()
+            )
 
-    def event(self, event) -> None:
+    def event(self, event: pygame.event.Event) -> None:
         from src.game_sprites import Direction
 
         self.cheats.event(event)
 
         if event.type == pygame.KEYDOWN:
-            player = self.sprites.sprites()[0]
+            player = cast(Any, self.sprites.sprites()[0])
             if event.key == pygame.K_LEFT:
                 player.disered_direction = Direction.WEST
             if event.key == pygame.K_DOWN:

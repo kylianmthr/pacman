@@ -1,14 +1,14 @@
-# mypy: ignore-errors
 import pygame
+from typing import Any
 
 
 class Cheats:
-    def __init__(self, game):
+    def __init__(self, game: Any) -> None:
         self.game = game
         self.invisibility = False
         self.speed = 1
 
-    def event(self, evt) -> None:
+    def event(self, evt: pygame.event.Event) -> None:
         if evt.type == pygame.KEYDOWN:
             if evt.key == pygame.K_i:
                 self.invisibility = not self.invisibility
