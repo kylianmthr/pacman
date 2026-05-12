@@ -119,23 +119,7 @@ class EndOfGameMenu:
         )
         self.assets.add(self.player_name_display)
 
-    def show(
-        self,
-    ):
-
-        self.engine.screen.fill("black")
-        self.write_player_score()
-        self.assets.draw(self.engine.screen)
-
-    def write_player_score(self):
-        self.player_name_display.image = self.root_menu.montserrat.render(
-            self.player_name, True, "black", None
-        )
-        self.player_name_display.rect = (
-            self.player_name_display.image.get_rect(
-                center=self.player_name_display.coordinates
-            )
-        )
+    def display_score(self):
         if self.engine.score > 9999999999999:
             self.assets.add(
                 Text(
@@ -160,6 +144,24 @@ class EndOfGameMenu:
                     ),
                 ),
             )
+
+    def show(
+        self,
+    ):
+
+        self.engine.screen.fill("black")
+        self.write_player_score()
+        self.assets.draw(self.engine.screen)
+
+    def write_player_score(self):
+        self.player_name_display.image = self.root_menu.montserrat.render(
+            self.player_name, True, "black", None
+        )
+        self.player_name_display.rect = (
+            self.player_name_display.image.get_rect(
+                center=self.player_name_display.coordinates
+            )
+        )
 
     def event(self, event) -> bool:
         if (event.unicode.isalnum() or event.unicode == " ") and len(

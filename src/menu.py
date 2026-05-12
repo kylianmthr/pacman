@@ -33,8 +33,10 @@ class Menu:
         if menu_to_switch == "welcome_menu":
             self.current_menu = self.welcome_menu
         if menu_to_switch == "game_over_menu":
+            self.game_over_menu.display_score()
             self.current_menu = self.game_over_menu
         if menu_to_switch == "game_finished_menu":
+            self.game_over_menu.display_score()
             self.current_menu = self.game_finished_menu
         self.current_menu.show()
 
