@@ -44,6 +44,7 @@ class Engine:
             config.points_per_ghost,
             config.lives,
             config.level_max_time,
+            config.pacgum,
         )
         self.music = Music(
             "./assets/pacman_beginning.mp3",
@@ -79,6 +80,7 @@ class Engine:
                 self.config.points_per_ghost,
                 self.config.lives,
                 self.config.level_max_time,
+                self.config.pacgum,
             )
             self.loading = False
 
