@@ -8,7 +8,6 @@ class LeaderBoardMenu:
     def __init__(self, engine, root_menu):
         self.root_menu = root_menu
         self.engine = engine
-        pygame.font.init()
         self.assets = pygame.sprite.Group()
         self.buttons = []
         self.button_idx = 0
@@ -140,8 +139,6 @@ class LeaderBoardMenu:
         [pygame.sprite.Sprite.kill(asset) for asset in self.assets]
         self.create_static_surfaces()
         self.engine.leaderboard.data_retriever()
-        superfunnel = pygame.font.Font("./assets/SuperFunnel.ttf", 20)
-        karma_future = pygame.font.Font("./assets/KarmaFuture.ttf", 20)
         coordinate_player_name = Vector2(
             self.engine.screen_width * 0.05, self.engine.screen_height * 0.3
         )
@@ -156,7 +153,7 @@ class LeaderBoardMenu:
                     TextFromLeft(
                         f"{player.name}",
                         "yellow",
-                        superfunnel,
+                        self.root_menu.superfunnel,
                         coordinate_player_name,
                     )
                 )
@@ -165,7 +162,7 @@ class LeaderBoardMenu:
                         TextFromRight(
                             "Game finished",
                             "yellow",
-                            karma_future,
+                            self.root_menu.karma_future,
                             coordinate_player_score,
                         )
                     )
@@ -174,7 +171,7 @@ class LeaderBoardMenu:
                         TextFromRight(
                             f"{player.score}",
                             "yellow",
-                            karma_future,
+                            self.root_menu.karma_future,
                             coordinate_player_score,
                         )
                     )

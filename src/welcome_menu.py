@@ -8,7 +8,6 @@ from src.wall import Wall
 class WelcomeMenu:
     def __init__(self, engine, root_menu):
         self.root_menu = root_menu
-        pygame.font.init()
         self.engine = engine
         self.assets = pygame.sprite.Group()
         self.music_state = "./assets/music_on.png"
@@ -63,7 +62,7 @@ class WelcomeMenu:
         self.update_cursor()
 
     def create_static_surfaces(self):
-        pixelmania = pygame.font.Font("./assets/Pixelmania.ttf", 15)
+        # self.root_menu.pixelmania = pygame.font.Font("./assets/self.root_menu.Pixelmania.ttf", 15)
         self.assets.add(
             Picture(
                 "logo",
@@ -81,7 +80,7 @@ class WelcomeMenu:
         self.assets.add(
             Button(
                 "START",
-                pixelmania,
+                self.root_menu.pixelmania,
                 (
                     self.engine.screen_width // 2,
                     self.engine.screen_height * 0.4,
@@ -93,7 +92,7 @@ class WelcomeMenu:
         self.assets.add(
             Button(
                 "LEADERBOARD",
-                pixelmania,
+                self.root_menu.pixelmania,
                 (
                     self.engine.screen_width // 2,
                     self.engine.screen_height * 0.4 + 50,
@@ -105,7 +104,7 @@ class WelcomeMenu:
         self.assets.add(
             Button(
                 "EXIT",
-                pixelmania,
+                self.root_menu.pixelmania,
                 (
                     self.engine.screen_width // 2,
                     self.engine.screen_height * 0.4 + 100,
@@ -228,6 +227,7 @@ class WelcomeMenu:
                 self.root_menu.switch_menu("leaderboard")
             elif self.buttons[self.button_idx].name == "EXIT":
                 self.engine.running = False
+                self.engine.quit = True
             elif self.buttons[self.button_idx].name == "music":
                 if self.music_state == "./assets/music_on.png":
                     self.music_state = "./assets/music_off.png"

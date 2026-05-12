@@ -19,6 +19,7 @@ class Engine:
         self.levels = config.level
         self.seed = config.seed
         self.running = True
+        self.quit = False
         self.music_active = True
         self.score = 0
         self.frame_rate = 60
@@ -56,26 +57,28 @@ class Engine:
             wall.image.fill(self.color)
 
     def next_level(self) -> None:
-        self.level += 1
-        self.screen_width = self.levels[self.level].width * 40 + 10
-        self.screen_height = self.levels[self.level].height * 40 + 40
-        self.screen = pygame.display.set_mode(
-            (self.screen_width, self.screen_height)
-        )
-        self.game = Game(
-            self,
-            self.screen,
-            self.levels[self.level].width,
-            self.levels[self.level].height,
-            self.seed,
-            self.config.points_per_pacgum,
-            self.config.points_per_super_pacgum,
-            self.config.points_per_ghost,
-        )
-        self.loading = False
+        if len(self.levels) - 1 == self.level:
+            self.menu.switch_menu("game_finished_menu")
+        else:
+            self.level += 1
+            self.screen_width = self.levels[self.level].width * 40 + 10
+            self.screen_height = self.levels[self.level].height * 40 + 40
+            self.screen = pygame.display.set_mode(
+                (self.screen_width, self.screen_height)
+            )
+            self.game = Game(
+                self,
+                self.screen,
+                self.levels[self.level].width,
+                self.levels[self.level].height,
+                self.seed,
+                self.config.points_per_pacgum,
+                self.config.points_per_super_pacgum,
+                self.config.points_per_ghost,
+            )
+            self.loading = False
 
     def event(self) -> None:
-
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if self.menu_active:
@@ -83,6 +86,7 @@ class Engine:
                 else:
                     self.game.event(event)
             if event.type == pygame.QUIT:
+                self.quit = True
                 self.running = False
 
     def run(self) -> None:
