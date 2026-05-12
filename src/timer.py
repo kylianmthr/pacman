@@ -1,7 +1,5 @@
 import pygame
 
-from src.pause import PauseMenu
-
 
 class Timer:
     def __init__(self, duration: int):

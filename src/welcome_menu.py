@@ -1,7 +1,7 @@
 import pygame
 from pygame import mixer
 from pygame.math import Vector2
-from src.menu_sprites import Button, Picture, Box, Text
+from src.menu_sprites import Button, Picture
 from src.wall import Wall
 
 

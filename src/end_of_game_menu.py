@@ -1,6 +1,6 @@
 import pygame
 
-from src.menu_sprites import Text, Box, Picture
+from src.menu_sprites import Text
 from src.models import Player
 
 
