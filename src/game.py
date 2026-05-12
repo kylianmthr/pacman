@@ -17,6 +17,7 @@ class Game:
         points_per_pacgum,
         points_per_super_pacgum,
         points_per_ghost,
+        lives,
     ) -> None:
         from src.game_sprites import (
             Player,
@@ -31,7 +32,7 @@ class Game:
         from src.timer import Timer
 
         self.engine = engine
-        self.lives = 3
+        self.lives = lives
         self.pause_menu = PauseMenu(self, self.engine)
         self.timer = Timer(90)
         self.hud = HUD(self, self.engine)
