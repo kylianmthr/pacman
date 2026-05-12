@@ -68,14 +68,14 @@ class Game:
         self.walls = pygame.sprite.Group()
         self.pacgums = pygame.sprite.Group()
         self.superpacgums = pygame.sprite.Group()
+        self.create_walls()
+        self.create_pacgums()
         for ghost in ghosts:
             self.ghosts.add(ghost)
             self.sprites.add(ghost)
         self.sprites.add(self.hud.score)
         self.sprites.add(self.hud.lives)
         self.sprites.add(self.hud.timer)
-        self.create_walls()
-        self.create_pacgums()
         self.points_per_pacgum = points_per_pacgum
         self.points_per_super_pacgum = points_per_super_pacgum
         self.points_per_ghost = points_per_ghost
