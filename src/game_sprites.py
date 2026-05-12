@@ -93,41 +93,42 @@ class GameSprite(pygame.sprite.Sprite):
     def movement(
         self, frame_index: dict[Direction, tuple[int, int]], speed: int = 2
     ):
-        if self.direction != self.disered_direction:
+        if not self.game.timer.paused:
+            if self.direction != self.disered_direction:
+                if (
+                    self.get_next_rect(
+                        self.disered_direction, speed
+                    ).collidelist(self.game.walls.sprites())
+                    == -1
+                    and self.rect.x % 40 == 10
+                    and self.rect.y % 40 == 10
+                ):
+                    self.direction = self.disered_direction
             if (
-                self.get_next_rect(self.disered_direction, speed).collidelist(
+                self.get_next_rect(self.direction, speed).collidelist(
                     self.game.walls.sprites()
                 )
                 == -1
-                and self.rect.x % 40 == 10
-                and self.rect.y % 40 == 10
             ):
-                self.direction = self.disered_direction
-        if (
-            self.get_next_rect(self.direction, speed).collidelist(
-                self.game.walls.sprites()
-            )
-            == -1
-        ):
-            if self.direction == Direction.SOUTH:
-                self.rect.y += speed
-            if self.direction == Direction.NORTH:
-                self.rect.y -= speed
-            if self.direction == Direction.EAST:
-                self.rect.x += speed
-            if self.direction == Direction.WEST:
-                self.rect.x -= speed
-            current_time = pygame.time.get_ticks()
-            if current_time - self.last_update >= self.frame_cooldown:
-                self.last_update = current_time
-                for direction, frames in frame_index.items():
-                    if self.direction == direction:
-                        self.current_frame = (
-                            frames[0]
-                            if self.current_frame == frames[1]
-                            else frames[1]
-                        )
-                self.image = self.images[self.current_frame]
+                if self.direction == Direction.SOUTH:
+                    self.rect.y += speed
+                if self.direction == Direction.NORTH:
+                    self.rect.y -= speed
+                if self.direction == Direction.EAST:
+                    self.rect.x += speed
+                if self.direction == Direction.WEST:
+                    self.rect.x -= speed
+                current_time = pygame.time.get_ticks()
+                if current_time - self.last_update >= self.frame_cooldown:
+                    self.last_update = current_time
+                    for direction, frames in frame_index.items():
+                        if self.direction == direction:
+                            self.current_frame = (
+                                frames[0]
+                                if self.current_frame == frames[1]
+                                else frames[1]
+                            )
+                    self.image = self.images[self.current_frame]
 
 
 class Player(GameSprite):

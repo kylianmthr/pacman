@@ -108,11 +108,13 @@ class Box(pygame.sprite.Sprite):
         width: int,
         height: int,
         coordinates: tuple[int, int],
-        color: str = "white",
+        alpha: int = 100,
+        color: str = "black",
         name="box",
     ) -> None:
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((width, height))
+        self.image = pygame.Surface((width, height), pygame.SRCALPHA)
         self.image.fill(color)
+        self.image.set_alpha(alpha)
         self.rect = self.image.get_rect(center=coordinates)
         self.name = name

@@ -1,7 +1,6 @@
 import pygame
 from src.cheat import Cheats
 from src.pacgum import Pacgum
-from src.timer import Timer
 from src.wall import Wall
 from mazegen import generator
 from pygame import mixer
@@ -28,9 +27,12 @@ class Game:
             Ghost,
         )
         from src.hud import HUD
+        from src.pause import PauseMenu
+        from src.timer import Timer
 
         self.engine = engine
         self.lives = 3
+        self.pause_menu = PauseMenu(self, screen)
         self.timer = Timer(90)
         self.hud = HUD(self, self.engine)
         self.width = width
@@ -170,6 +172,8 @@ class Game:
                 player.disered_direction = Direction.NORTH
             if event.key == pygame.K_RIGHT:
                 player.disered_direction = Direction.EAST
+            if event.key == pygame.K_ESCAPE:
+                self.timer.toggle_pause()
 
     def update(self) -> None:
         self.sprites.update()
@@ -182,3 +186,5 @@ class Game:
             self.engine.menu_active = True
             self.engine.menu.switch_menu("game_over_menu")
             mixer.music.stop()
+        if self.timer.paused:
+            self.pause_menu.draw()
