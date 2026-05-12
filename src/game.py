@@ -77,8 +77,6 @@ class Game:
         self.sprites.add(self.hud.lives)
         self.sprites.add(self.hud.timer)
         self.sprites.add(self.hud.level)
-        self.create_walls()
-        self.create_pacgums()
         self.points_per_pacgum = points_per_pacgum
         self.points_per_super_pacgum = points_per_super_pacgum
         self.points_per_ghost = points_per_ghost
