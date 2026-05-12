@@ -18,6 +18,7 @@ class Game:
         points_per_super_pacgum,
         points_per_ghost,
         lives,
+        level_max_time,
     ) -> None:
         from src.game_sprites import (
             Player,
@@ -34,7 +35,7 @@ class Game:
         self.engine = engine
         self.lives = lives
         self.pause_menu = PauseMenu(self, self.engine)
-        self.timer = Timer(90)
+        self.timer = Timer(level_max_time)
         self.hud = HUD(self, self.engine)
         self.width = width
         self.height = height
