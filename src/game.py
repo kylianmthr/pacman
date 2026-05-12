@@ -32,7 +32,7 @@ class Game:
 
         self.engine = engine
         self.lives = 3
-        self.pause_menu = PauseMenu(self, screen)
+        self.pause_menu = PauseMenu(self, self.engine)
         self.timer = Timer(90)
         self.hud = HUD(self, self.engine)
         self.width = width
@@ -174,6 +174,9 @@ class Game:
                 player.disered_direction = Direction.EAST
             if event.key == pygame.K_ESCAPE:
                 self.timer.toggle_pause()
+            if self.timer.paused:
+                if event.key == pygame.K_RETURN:
+                    self.engine.running = False
 
     def update(self) -> None:
         self.sprites.update()
