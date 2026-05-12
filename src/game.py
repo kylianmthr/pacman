@@ -4,6 +4,7 @@ from src.pacgum import Pacgum
 from src.wall import Wall
 from mazegen import generator
 from pygame import mixer
+import random
 
 
 class Game:
@@ -48,7 +49,7 @@ class Game:
         self.maze = generator.MazeGenerator(
             self.width,
             self.height,
-            seed,
+            seed if self.engine.level == 0 else random.randint(0, 999999),
             (0, 0),
             (self.width - 1, self.height - 1),
         )
