@@ -61,18 +61,6 @@ class EndOfGameMenu:
                 ),
             )
         )
-        # self.assets.add(
-        #     Box(
-        #         350,
-        #         70,
-        #         (
-        #             self.engine.screen_width // 2,
-        #             self.engine.screen_height * 0.75,
-        #         ),
-        #         500,
-        #         "yellow",
-        #     )
-        # )
 
         if self.type == "game_over":
             self.assets.add(
