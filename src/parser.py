@@ -51,7 +51,7 @@ class Parser:
             ValueError: If the file is empty or has not been loaded.
         """
         valid_config: GameConfig = {
-            "highscore_filename": "test",
+            "highscore_filename": "high_scores.json",
             "level": [
                 LevelType(width=10, height=10),
                 LevelType(width=10, height=10),

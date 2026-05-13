@@ -41,7 +41,7 @@ class Engine:
             (self.screen_width, self.screen_height)
         )
         self.clock = pygame.time.Clock()
-        self.leaderboard = Leaderboard()
+        self.leaderboard = Leaderboard(self.config.highscore_filename)
         self.menu = Menu(
             self,
         )
