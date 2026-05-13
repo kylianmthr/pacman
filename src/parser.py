@@ -67,7 +67,7 @@ class Parser:
         if self.content:
             try:
                 return Config(**json5.loads(self.content))
-            except ValidationError as e:
+            except Exception as e:
                 print("Configuration validation error:", e)
                 print("Loading default configuration.")
                 return Config(**valid_config)
