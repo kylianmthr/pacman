@@ -162,8 +162,6 @@ class Game:
                 - len(superpacgums)
                 - len(self.maze.forty_two_cell)
             )
-        print(self.pacgum)
-        print(self.width, self.height)
         cells = random.sample(cells, self.pacgum)
 
         for row in self.maze.maze:
