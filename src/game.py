@@ -2,7 +2,7 @@ import pygame
 from src.cheat import Cheats
 from src.pacgum import Pacgum
 from src.wall import Wall
-from mazegen import generator
+from mazegen import generator  # type: ignore[import-untyped]
 from pygame import mixer
 import random
 from typing import Any, cast
