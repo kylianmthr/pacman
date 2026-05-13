@@ -144,18 +144,26 @@ class Game:
         """Populate the maze with pacgum and super pacgum sprites."""
         offset_y = 23
         y = 0
-        superpacugums = self.get_superpacgum()
+        superpacgums = self.get_superpacgum()
         cells = [
             (row, col)
             for row in range(len(self.maze.maze))
             for col in range(len(self.maze.maze[0]))
         ]
-        for cell in superpacugums:
+        for cell in superpacgums:
             if cell in cells:
                 cells.remove(cell)
         for cell in self.maze.forty_two_cell:
             if cell in cells:
                 cells.remove(cell)
+        if self.pacgum >= self.width * self.height:
+            self.pacgum = (
+                self.width * self.height
+                - len(superpacgums)
+                - len(self.maze.forty_two_cell)
+            )
+        print(self.pacgum)
+        print(self.width, self.height)
         cells = random.sample(cells, self.pacgum)
 
         for row in self.maze.maze:
@@ -163,7 +171,7 @@ class Game:
             offset_x = 23
             for col in row:
                 if col != "1111":
-                    if (x, y) in superpacugums:
+                    if (x, y) in superpacgums:
                         pacgum = Pacgum(5, (offset_x, offset_y))
                         self.superpacgums.add(pacgum)
                         self.sprites.add(pacgum)

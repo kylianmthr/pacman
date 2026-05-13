@@ -3,7 +3,6 @@
 from typing import Optional
 import json5
 from src.models import Config, LevelType
-from pydantic import ValidationError
 from typing import TypedDict, List
 
 
