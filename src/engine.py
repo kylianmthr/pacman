@@ -106,6 +106,7 @@ class Engine:
                 self.config.level_max_time,
                 self.config.pacgum,
             )
+            self.menu = Menu(self)
             self.loading = False
 
     def event(self) -> None:
