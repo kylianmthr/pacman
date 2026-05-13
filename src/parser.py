@@ -63,11 +63,9 @@ class Parser:
             "seed": 42,
             "level_max_time": 90,
         }
-        if self.content:
-            try:
-                return Config(**json5.loads(self.content))
-            except Exception as e:
-                print("Configuration validation error:", e)
-                print("Loading default configuration.")
-                return Config(**valid_config)
-        raise ValueError("File empty or not loaded")
+        try:
+            return Config(**json5.loads(self.content))
+        except Exception as e:
+            print("Configuration validation error:", e)
+            print("Loading default configuration.")
+            return Config(**valid_config)

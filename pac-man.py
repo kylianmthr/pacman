@@ -9,7 +9,10 @@ if __name__ == "__main__":
         if len(sys.argv) != 2:
             raise ValueError("Invalid arguments")
         parser = Parser(sys.argv[1])
-        parser.load()
+        try:
+            parser.load()
+        except Exception:
+            print("Can't open config file")
         data = parser.parse()
         try:
             while True:

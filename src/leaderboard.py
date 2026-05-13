@@ -48,11 +48,16 @@ class Leaderboard:
         if not path.exists():
             self.create_json()
         else:
-            with open(f"{self.file_name}", "r") as file:
-                self.high_scores = HighScore.model_validate_json(file.read())
-                self.high_scores.best_players.sort(
-                    key=lambda player: player.score, reverse=True
-                )
-                self.high_scores.best_players = self.high_scores.best_players[
-                    :10
-                ]
+            try:
+                with open(f"{self.file_name}", "r") as file:
+                    self.high_scores = HighScore.model_validate_json(
+                        file.read()
+                    )
+                    self.high_scores.best_players.sort(
+                        key=lambda player: player.score, reverse=True
+                    )
+                    self.high_scores.best_players = (
+                        self.high_scores.best_players[:10]
+                    )
+            except Exception:
+                self.create_json()
