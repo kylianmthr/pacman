@@ -3,6 +3,7 @@
 from typing import Optional
 import json5
 from src.models import Config
+from pydantic import ValidationError
 
 
 class Parser:
@@ -36,6 +37,25 @@ class Parser:
         Raises:
             ValueError: If the file is empty or has not been loaded.
         """
+        valid_config = {
+            "highscore_filename": "test",
+            "level": [
+                {"width": 10, "height": 10},
+                {"width": 10, "height": 10},
+            ],
+            "lives": 5,
+            "pacgum": 5,
+            "points_per_pacgum": 5,
+            "points_per_super_pacgum": 5,
+            "points_per_ghost": 5,
+            "seed": 42,
+            "level_max_time": 90,
+        }
         if self.content:
-            return Config(**json5.loads(self.content))
+            try:
+                return Config(**json5.loads(self.content))
+            except ValidationError as e:
+                print("Configuration validation error:", e)
+                print("Loading default configuration.")
+                return Config(**valid_config)
         raise ValueError("File empty or not loaded")

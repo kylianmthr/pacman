@@ -7,7 +7,7 @@ from typing import Optional
 class LevelType(BaseModel):
     """Model describing a single level configuration."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="ignore")
     width: int = Field(ge=3)
     height: int = Field(ge=3)
 
@@ -15,7 +15,7 @@ class LevelType(BaseModel):
 class Config(BaseModel):
     """Configuration model for game settings."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="ignore")
     highscore_filename: str
     level: list[LevelType]
     lives: int = Field(ge=1)
