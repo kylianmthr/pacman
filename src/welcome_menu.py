@@ -49,7 +49,7 @@ class WelcomeMenu:
 
         Args:
             sprite: Sprite instance to update.
-            path: Ignored; retained for API compatibility.
+            path: Ignored legacy parameter retained for compatibility.
         """
         sprite.image = pygame.image.load(self.music_state)
         sprite.image = pygame.transform.smoothscale(

@@ -18,7 +18,7 @@ class Music:
 
         Args:
             start_song: Path to the start music track.
-            game_song: Path to the pacgum sound effect (named game_song).
+            game_song: Path to the pacgum sound effect (legacy name retained).
             ghost_song: Path to the ghost chase music track.
             pacgum_song: Path to the super pacgum sound effect.
         """
