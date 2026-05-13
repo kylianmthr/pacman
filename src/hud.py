@@ -9,7 +9,7 @@ from src.menu_sprites import TextFromLeft
 class HUD:
     """Container for HUD text sprites and their updates."""
 
-    def __init__(self, game: Game, engine: Engine):
+    def __init__(self, game: Game, engine: Engine) -> None:
         """Initialize HUD sprites.
 
         Args:
@@ -70,7 +70,7 @@ class HUD:
             color: str,
             font: pygame.font.Font,
             coordinates: tuple[int, int],
-        ):
+        ) -> None:
             """Initialize the score sprite.
 
             Args:
@@ -99,7 +99,7 @@ class HUD:
             color: str,
             font: pygame.font.Font,
             coordinates: tuple[int, int],
-        ):
+        ) -> None:
             """Initialize the lives sprite.
 
             Args:
@@ -128,7 +128,7 @@ class HUD:
             color: str,
             font: pygame.font.Font,
             coordinates: tuple[int, int],
-        ):
+        ) -> None:
             """Initialize the timer sprite.
 
             Args:
@@ -161,7 +161,7 @@ class HUD:
             color: str,
             font: pygame.font.Font,
             coordinates: tuple[int, int],
-        ):
+        ) -> None:
             """Initialize the level sprite.
 
             Args:

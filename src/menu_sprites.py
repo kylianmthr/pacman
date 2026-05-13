@@ -62,7 +62,7 @@ class Text(pygame.sprite.Sprite):
         color: str,
         font: pygame.font.Font,
         coordinates: tuple[int, int],
-    ):
+    ) -> None:
         """Create a text sprite centered at the given coordinates.
 
         Args:
@@ -90,7 +90,7 @@ class TextFromRight(pygame.sprite.Sprite):
         color: str,
         font: pygame.font.Font,
         coordinates: tuple[int, int],
-    ):
+    ) -> None:
         """Create a text sprite aligned to the right.
 
         Args:
@@ -116,7 +116,7 @@ class TextFromLeft(pygame.sprite.Sprite):
         color: str,
         font: pygame.font.Font,
         coordinates: tuple[int, int],
-    ):
+    ) -> None:
         """Create a text sprite aligned to the left.
 
         Args:
