@@ -1,5 +1,5 @@
 import pygame
-from pygame import Vector2
+from typing import Any
 from src.leader_board_menu import LeaderBoardMenu
 from src.welcome_menu import WelcomeMenu
 from src.end_of_game_menu import EndOfGameMenu
@@ -7,10 +7,10 @@ from src.menu_sprites import Box, Picture, Button
 
 
 class HelpMenu:
-    def __init__(self, engine, root_menu):
+    def __init__(self, engine: Any, root_menu: Any) -> None:
         self.root_menu = root_menu
         self.engine = engine
-        self.assets = pygame.sprite.Group()
+        self.assets: Any = pygame.sprite.Group()
         pixelmania = pygame.font.Font("./assets/Pixelmania.ttf", 15)
 
         self.assets.add(
@@ -41,7 +41,10 @@ class HelpMenu:
                 "./assets/pacman_right.png",
                 20,
                 20,
-                (Vector2(return_button.rect.midright) + Vector2(15, 0)),
+                (
+                    int(return_button.rect.midright[0] + 15),
+                    int(return_button.rect.midright[1]),
+                ),
             )
         )
         self.assets.add(
@@ -50,25 +53,28 @@ class HelpMenu:
                 "./assets/pacman_left.png",
                 20,
                 20,
-                (Vector2(return_button.rect.midleft) + Vector2(-15, 0)),
+                (
+                    int(return_button.rect.midleft[0] - 15),
+                    int(return_button.rect.midleft[1]),
+                ),
             )
         )
 
-    def draw(self):
+    def draw(self) -> None:
         self.assets.draw(self.engine.screen)
 
     def show(
         self,
-    ):
+    ) -> None:
         self.assets.draw(self.engine.screen)
 
-    def event(self, event) -> bool:
+    def event(self, event: pygame.event.Event) -> None:
         if event.key == pygame.K_RETURN:
             self.root_menu.switch_menu("welcome_menu")
 
 
 class Menu:
-    def __init__(self, engine):
+    def __init__(self, engine: Any) -> None:
         pygame.font.init()
         self.pacfont = pygame.font.Font("./assets/PAC-FONT.TTF", 35)
         self.montserrat = pygame.font.Font("./assets/montserrat.ttf", 15)
@@ -84,12 +90,12 @@ class Menu:
         self.welcome_menu = WelcomeMenu(self.engine, self)
         self.mute = False
         self.leaderboard_menu = LeaderBoardMenu(self.engine, self)
-        self.current_menu = self.welcome_menu
+        self.current_menu: Any = self.welcome_menu
 
-    def show(self):
+    def show(self) -> None:
         self.current_menu.show()
 
-    def switch_menu(self, menu_to_switch):
+    def switch_menu(self, menu_to_switch: str) -> None:
         self.engine.menu_active = True
         if menu_to_switch == "help_menu":
             self.current_menu = self.help_menu
@@ -106,5 +112,5 @@ class Menu:
             self.current_menu = self.game_finished_menu
         self.current_menu.show()
 
-    def event(self, event):
+    def event(self, event: pygame.event.Event) -> None:
         self.current_menu.event(event)

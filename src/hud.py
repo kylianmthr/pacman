@@ -62,7 +62,7 @@ class HUD:
             super().__init__(text, color, font, coordinates)
             self.hud = hud
 
-        def update(self):
+        def update(self) -> None:
             score = self.hud.engine.score
             self.text = f"SCORE  {str(score) if score <= 9999 else '9999'}"
             self.image = self.font.render(self.text, True, self.color)
@@ -79,7 +79,7 @@ class HUD:
             super().__init__(text, color, font, coordinates)
             self.hud = hud
 
-        def update(self):
+        def update(self) -> None:
             self.text = f"LIVES  {str(self.hud.game.lives)}"
             self.rect.x = self.hud.score.get_size()[0] + 10 * 2
             self.image = self.font.render(self.text, True, self.color)
@@ -96,7 +96,7 @@ class HUD:
             super().__init__(text, color, font, coordinates)
             self.hud = hud
 
-        def update(self):
+        def update(self) -> None:
             self.text = f"TIMER  {str(self.hud.game.timer.current_time())}"
             self.rect.x = (
                 self.hud.score.get_size()[0]
@@ -117,7 +117,7 @@ class HUD:
             super().__init__(text, color, font, coordinates)
             self.hud = hud
 
-        def update(self):
+        def update(self) -> None:
             self.text = f"LEVEL  {str(self.hud.game.engine.level + 1)}"
             self.rect.x = (
                 self.hud.score.get_size()[0]

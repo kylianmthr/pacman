@@ -1,31 +1,32 @@
 import pygame
 from pygame.math import Vector2
+from typing import Any, cast
 from src.menu_sprites import Button, Picture, Text, TextFromRight, TextFromLeft
 from src.wall import Wall
 
 
 class LeaderBoardMenu:
-    def __init__(self, engine, root_menu):
+    def __init__(self, engine: Any, root_menu: Any) -> None:
         self.root_menu = root_menu
         self.engine = engine
-        self.assets = pygame.sprite.Group()
-        self.buttons = []
+        self.assets: Any = pygame.sprite.Group()
+        self.buttons: list[Button] = []
         self.button_idx = 0
-        self.cursors_map = {}
+        self.cursors_map: dict[str, dict[str, Vector2]] = {}
         self.create_static_surfaces()
 
     def show(
         self,
-    ):
+    ) -> None:
         self.engine.screen.fill("black")
         self.assets.draw(self.engine.screen)
 
     def update_sprite(
-        self, sprite: pygame.sprite.Sprite, coordinates: tuple[int, int]
-    ):
+        self, sprite: Any, coordinates: tuple[float, float]
+    ) -> None:
         sprite.rect = sprite.image.get_rect(center=coordinates)
 
-    def create_static_surfaces(self):
+    def create_static_surfaces(self) -> None:
         self.assets.add(
             Text(
                 "1              9",
@@ -89,12 +90,17 @@ class LeaderBoardMenu:
                 20,
                 20,
                 (
-                    (
+                    int(
                         self.cursors_map[self.buttons[self.button_idx].name][
                             "right"
-                        ]
-                    )
-                    + Vector2(15, 0)
+                        ].x
+                        + 15
+                    ),
+                    int(
+                        self.cursors_map[self.buttons[self.button_idx].name][
+                            "right"
+                        ].y
+                    ),
                 ),
             )
         )
@@ -104,8 +110,19 @@ class LeaderBoardMenu:
                 "./assets/pacman_left.png",
                 20,
                 20,
-                (self.cursors_map[self.buttons[self.button_idx].name]["left"])
-                + Vector2(-15, 0),
+                (
+                    int(
+                        self.cursors_map[self.buttons[self.button_idx].name][
+                            "left"
+                        ].x
+                        - 15
+                    ),
+                    int(
+                        self.cursors_map[self.buttons[self.button_idx].name][
+                            "left"
+                        ].y
+                    ),
+                ),
             )
         )
         self.assets.add(
@@ -133,8 +150,9 @@ class LeaderBoardMenu:
             )
         )
 
-    def update_leaderboard_surfaces(self):
-        [pygame.sprite.Sprite.kill(asset) for asset in self.assets]
+    def update_leaderboard_surfaces(self) -> None:
+        for asset in self.assets:
+            asset.kill()
         self.create_static_surfaces()
         self.engine.leaderboard.data_retriever()
         coordinate_player_name = Vector2(
@@ -152,7 +170,10 @@ class LeaderBoardMenu:
                         f"{player.name}",
                         "yellow",
                         self.root_menu.superfunnel,
-                        coordinate_player_name,
+                        (
+                            int(coordinate_player_name.x),
+                            int(coordinate_player_name.y),
+                        ),
                     )
                 )
                 if player.score > 9999999999999:
@@ -161,7 +182,10 @@ class LeaderBoardMenu:
                             "Game finished",
                             "yellow",
                             self.root_menu.karma_future,
-                            coordinate_player_score,
+                            (
+                                int(coordinate_player_score.x),
+                                int(coordinate_player_score.y),
+                            ),
                         )
                     )
                 else:
@@ -170,13 +194,20 @@ class LeaderBoardMenu:
                             f"{player.score}",
                             "yellow",
                             self.root_menu.karma_future,
-                            coordinate_player_score,
+                            (
+                                int(coordinate_player_score.x),
+                                int(coordinate_player_score.y),
+                            ),
                         )
                     )
-        frames = [frame for frame in self.assets if frame.name == "frame"]
+        frames = [
+            frame
+            for frame in self.assets
+            if cast(Any, frame).name == "frame"
+        ]
         for frame in frames:
             frame.image.fill(self.engine.color)
 
-    def event(self, event) -> bool:
+    def event(self, event: pygame.event.Event) -> None:
         if event.key == pygame.K_RETURN:
             self.root_menu.switch_menu("welcome_menu")

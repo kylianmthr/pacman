@@ -1,38 +1,36 @@
 import pygame
-from typing import Union
+from pygame.surface import Surface
 
 
 class Button(pygame.sprite.Sprite):
     def __init__(
         self,
         name: str,
-        object: Union[pygame.font.Font | str],
+        object: pygame.font.Font | str,
         coordinates: tuple[int, int],
         position: int,
         color: str,
-        scale_width=40,
-        scale_height=40,
-    ):
+        scale_width: int = 40,
+        scale_height: int = 40,
+    ) -> None:
         super().__init__()
         self.name = name
         self.object = object
         self.position = position
-        self.image = None
         self.coordinates = coordinates
         self.color = color
         self.scale_width = scale_width
         self.scale_height = scale_height
-        self.choose_type()
+        self.image: Surface = self.choose_type()
         self.rect = self.image.get_rect(center=coordinates)
 
-    def choose_type(self):
+    def choose_type(self) -> Surface:
         if isinstance(self.object, pygame.font.Font):
-            self.image = self.object.render(self.name, True, self.color, None)
-        if isinstance(self.object, str):
-            self.image = pygame.image.load(self.object)
-            self.image = pygame.transform.smoothscale(
-                self.image, (self.scale_width, self.scale_height)
-            )
+            return self.object.render(self.name, True, self.color, None)
+        image = pygame.image.load(self.object)
+        return pygame.transform.smoothscale(
+            image, (self.scale_width, self.scale_height)
+        )
 
 
 class Text(pygame.sprite.Sprite):
@@ -85,7 +83,7 @@ class TextFromLeft(pygame.sprite.Sprite):
         self.image = self.font.render(self.text, True, color, None)
         self.rect = self.image.get_rect(midleft=coordinates)
 
-    def get_size(self):
+    def get_size(self) -> tuple[int, int]:
         return self.font.size(self.text)
 
 
@@ -115,7 +113,7 @@ class Box(pygame.sprite.Sprite):
         coordinates: tuple[int, int],
         alpha: int = 100,
         color: str = "black",
-        name="box",
+        name: str = "box",
     ) -> None:
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((width, height), pygame.SRCALPHA)

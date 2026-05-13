@@ -4,12 +4,12 @@ from src.models import HighScore, Player
 
 
 class Leaderboard:
-    def __init__(self):
+    def __init__(self) -> None:
         self.high_scores = HighScore()
         self.source_list_adapter = TypeAdapter(HighScore)
         self.data_retriever()
 
-    def rank_player(self, player: Player):
+    def rank_player(self, player: Player) -> None:
         self.data_retriever()
         self.high_scores.best_players.append(player)
         self.high_scores.best_players.sort(
@@ -21,7 +21,7 @@ class Leaderboard:
                 self.source_list_adapter.dump_json(self.high_scores, indent=4)
             )
 
-    def create_json(self):
+    def create_json(self) -> None:
         for i in range(10):
             player = Player()
             self.high_scores.best_players.append(player)
@@ -30,9 +30,9 @@ class Leaderboard:
                 self.source_list_adapter.dump_json(self.high_scores, indent=4)
             )
 
-    def data_retriever(self):
-        file = Path("high_scores.json")
-        if not file.exists():
+    def data_retriever(self) -> None:
+        path = Path("high_scores.json")
+        if not path.exists():
             self.create_json()
         else:
             with open("high_scores.json", "r") as file:

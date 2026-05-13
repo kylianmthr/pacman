@@ -8,7 +8,7 @@ class Wall(pygame.sprite.Sprite):
         height: int,
         coordinates: tuple[int, int],
         color: str = "white",
-        name="wall",
+        name: str = "wall",
     ) -> None:
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((width, height))
