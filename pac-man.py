@@ -1,11 +1,14 @@
 """Run the Pac-Man game using the configured settings."""
 
+import sys
 from src.engine import Engine
 from src.parser import Parser
 
 if __name__ == "__main__":
     try:
-        parser = Parser("config.json")
+        if len(sys.argv) != 2:
+            raise ValueError("Invalid arguments")
+        parser = Parser(sys.argv[1])
         parser.load()
         data = parser.parse()
         try:

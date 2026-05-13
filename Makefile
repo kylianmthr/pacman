@@ -6,10 +6,10 @@ install:
 	uv sync
 
 run: ${NAME}
-	uv run python ${NAME}
+	uv run python ${NAME} config.json
 
 debug:
-	uv run python -m pdb ${NAME}
+	uv run python -m pdb ${NAME} config.json
 
 clean:
 	find . -iname "__pycache__" -type d -exec rm -rf "{}" +
