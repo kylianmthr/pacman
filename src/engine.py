@@ -3,8 +3,9 @@
 import pygame
 import os
 from typing import Any, cast
+import random
 
-from src.models import Config
+from src.models import Config, LevelType
 from src.menu import Menu
 from src.game import Game
 from src.leaderboard import Leaderboard
@@ -27,6 +28,7 @@ class Engine:
         self.level = 0
         self.loading = False
         self.levels = config.level
+        self.fill_levels()
         self.seed = config.seed
         self.running = True
         self.quit = False
@@ -63,6 +65,15 @@ class Engine:
             "./assets/pacgum.wav",
         )
         self.music.start_music()
+
+    def fill_levels(self) -> None:
+        while len(self.levels) < 10:
+            self.levels.append(
+                LevelType(
+                    width=random.randint(10, 20),
+                    height=random.randint(10, 20),
+                )
+            )
 
     def change_wall_color(self) -> None:
         """Update all wall sprites to match the current engine color."""
