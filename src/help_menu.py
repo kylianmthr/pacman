@@ -116,7 +116,7 @@ class HelpMenu:
 
         self.assets.add(
             Text(
-                "ESC - Pause Game",
+                "ESC - Pause and Resume Game",
                 "white",
                 self.root_menu.montserrat,
                 (
