@@ -1,3 +1,5 @@
+"""Welcome menu with navigation and settings toggles."""
+
 import pygame
 from pygame import mixer
 from pygame.math import Vector2
@@ -7,7 +9,15 @@ from src.wall import Wall
 
 
 class WelcomeMenu:
+    """Display the main menu and handle selections."""
+
     def __init__(self, engine: Any, root_menu: Any) -> None:
+        """Initialize the welcome menu and static assets.
+
+        Args:
+            engine: Engine instance for rendering and state updates.
+            root_menu: Parent menu for switching views.
+        """
         self.root_menu = root_menu
         self.engine = engine
         self.assets: Any = pygame.sprite.Group()
@@ -19,15 +29,28 @@ class WelcomeMenu:
         self.create_static_surfaces()
 
     def show(self) -> None:
+        """Render the welcome menu to the screen."""
         self.engine.screen.fill("black")
         self.assets.draw(self.engine.screen)
 
     def update_sprite_coordinate(
         self, sprite: Any, coordinates: tuple[float, ...]
     ) -> None:
+        """Move a sprite to the specified coordinates.
+
+        Args:
+            sprite: Sprite instance to update.
+            coordinates: New center coordinates.
+        """
         sprite.rect = sprite.image.get_rect(center=coordinates)
 
     def update_sprite_file_path(self, sprite: Any, path: str) -> None:
+        """Update the music icon sprite based on the current state.
+
+        Args:
+            sprite: Sprite instance to update.
+            path: Path to the new image asset (unused; uses music_state).
+        """
         sprite.image = pygame.image.load(self.music_state)
         sprite.image = pygame.transform.smoothscale(
             sprite.image, (sprite.scale_width, sprite.scale_height)
@@ -35,6 +58,7 @@ class WelcomeMenu:
         sprite.rect = sprite.image.get_rect(center=sprite.coordinates)
 
     def update_cursor(self) -> None:
+        """Reposition the selection cursor based on the active button."""
         for sprite in self.assets:
             if cast(Any, sprite).name == "right_selector":
                 self.update_sprite_coordinate(
@@ -58,11 +82,17 @@ class WelcomeMenu:
                 )
 
     def item_selection(self, move: int) -> None:
+        """Move the selection cursor within the button list.
+
+        Args:
+            move: Directional offset for the selection index.
+        """
         if len(self.buttons) > 0:
             self.button_idx = (self.button_idx + move) % len(self.buttons)
         self.update_cursor()
 
     def create_static_surfaces(self) -> None:
+        """Create static sprites for the welcome menu layout."""
         self.assets.add(
             Picture(
                 "logo",
@@ -228,6 +258,7 @@ class WelcomeMenu:
         )
 
     def change_color_frame(self) -> None:
+        """Cycle frame color and apply it to walls."""
         frames = [
             frame
             for frame in self.assets
@@ -250,6 +281,11 @@ class WelcomeMenu:
             frame.image.fill(self.engine.color)
 
     def event(self, event: pygame.event.Event) -> None:
+        """Handle input events for menu navigation and actions.
+
+        Args:
+            event: Pygame event to process.
+        """
         if event.key == pygame.K_RETURN:
             if self.buttons[self.button_idx].name == "START":
                 self.engine.menu_active = False

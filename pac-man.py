@@ -1,3 +1,5 @@
+"""Run the Pac-Man game using the configured settings."""
+
 from src.engine import Engine
 from src.parser import Parser
 

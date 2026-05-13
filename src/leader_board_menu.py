@@ -1,3 +1,5 @@
+"""Leaderboard menu display and navigation."""
+
 import pygame
 from pygame.math import Vector2
 from typing import Any, cast
@@ -6,7 +8,15 @@ from src.wall import Wall
 
 
 class LeaderBoardMenu:
+    """Render the leaderboard screen and return navigation."""
+
     def __init__(self, engine: Any, root_menu: Any) -> None:
+        """Initialize the leaderboard menu assets.
+
+        Args:
+            engine: Engine instance for rendering and state access.
+            root_menu: Parent menu for shared fonts.
+        """
         self.root_menu = root_menu
         self.engine = engine
         self.assets: Any = pygame.sprite.Group()
@@ -18,15 +28,23 @@ class LeaderBoardMenu:
     def show(
         self,
     ) -> None:
+        """Draw the leaderboard menu to the screen."""
         self.engine.screen.fill("black")
         self.assets.draw(self.engine.screen)
 
     def update_sprite(
         self, sprite: Any, coordinates: tuple[float, float]
     ) -> None:
+        """Update the sprite position.
+
+        Args:
+            sprite: Sprite instance to move.
+            coordinates: New center coordinates.
+        """
         sprite.rect = sprite.image.get_rect(center=coordinates)
 
     def create_static_surfaces(self) -> None:
+        """Create static UI elements for the leaderboard."""
         self.assets.add(
             Text(
                 "1              9",
@@ -151,6 +169,7 @@ class LeaderBoardMenu:
         )
 
     def update_leaderboard_surfaces(self) -> None:
+        """Refresh leaderboard entries and frame colors."""
         for asset in self.assets:
             asset.kill()
         self.create_static_surfaces()
@@ -209,5 +228,10 @@ class LeaderBoardMenu:
             frame.image.fill(self.engine.color)
 
     def event(self, event: pygame.event.Event) -> None:
+        """Handle input events for the leaderboard.
+
+        Args:
+            event: Pygame event to process.
+        """
         if event.key == pygame.K_RETURN:
             self.root_menu.switch_menu("welcome_menu")

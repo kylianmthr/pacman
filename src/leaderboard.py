@@ -1,15 +1,25 @@
+"""High score persistence and ranking logic."""
+
 from pathlib import Path
 from pydantic import TypeAdapter
 from src.models import HighScore, Player
 
 
 class Leaderboard:
+    """Manage leaderboard data and persistence."""
+
     def __init__(self) -> None:
+        """Initialize leaderboard data and load existing scores."""
         self.high_scores = HighScore()
         self.source_list_adapter = TypeAdapter(HighScore)
         self.data_retriever()
 
     def rank_player(self, player: Player) -> None:
+        """Insert a player into the leaderboard and persist results.
+
+        Args:
+            player: Player entry to rank.
+        """
         self.data_retriever()
         self.high_scores.best_players.append(player)
         self.high_scores.best_players.sort(
@@ -22,6 +32,7 @@ class Leaderboard:
             )
 
     def create_json(self) -> None:
+        """Create a default leaderboard file with empty player slots."""
         for i in range(10):
             player = Player()
             self.high_scores.best_players.append(player)
@@ -31,6 +42,7 @@ class Leaderboard:
             )
 
     def data_retriever(self) -> None:
+        """Load leaderboard data or create default storage."""
         path = Path("high_scores.json")
         if not path.exists():
             self.create_json()

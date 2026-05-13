@@ -1,10 +1,19 @@
+"""Pause menu overlay displayed during gameplay."""
+
 import pygame
 from typing import Any
 from src.menu_sprites import Box, Text, Button, Picture
 
 
 class PauseMenu:
+    """Render a pause overlay with a return option."""
+
     def __init__(self, engine: Any) -> None:
+        """Initialize pause menu assets.
+
+        Args:
+            engine: Engine instance for screen sizing and rendering.
+        """
         self.engine = engine
         self.assets: Any = pygame.sprite.Group()
         pixelmania = pygame.font.Font("./assets/Pixelmania.ttf", 15)
@@ -64,4 +73,5 @@ class PauseMenu:
         )
 
     def draw(self) -> None:
+        """Draw the pause overlay."""
         self.assets.draw(self.engine.screen)
