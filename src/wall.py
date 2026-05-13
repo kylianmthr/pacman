@@ -1,7 +1,11 @@
+"""Wall sprite for maze boundaries and frames."""
+
 import pygame
 
 
 class Wall(pygame.sprite.Sprite):
+    """Rectangular wall or frame sprite."""
+
     def __init__(
         self,
         width: int,
@@ -10,6 +14,15 @@ class Wall(pygame.sprite.Sprite):
         color: str = "white",
         name: str = "wall",
     ) -> None:
+        """Initialize a wall sprite.
+
+        Args:
+            width: Width of the wall in pixels.
+            height: Height of the wall in pixels.
+            coordinates: Top-left coordinates for placement.
+            color: Fill color.
+            name: Sprite identifier.
+        """
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((width, height))
         self.image.fill(color)

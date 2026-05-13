@@ -1,14 +1,20 @@
+"""Pydantic models for configuration and leaderboard data."""
+
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
 
 
 class LevelType(BaseModel):
+    """Model describing a single level configuration."""
+
     model_config = ConfigDict(extra="forbid")
     width: int = Field(ge=3)
     height: int = Field(ge=3)
 
 
 class Config(BaseModel):
+    """Configuration model for game settings."""
+
     model_config = ConfigDict(extra="forbid")
     highscore_filename: str
     level: list[LevelType]
@@ -22,6 +28,8 @@ class Config(BaseModel):
 
 
 class Player(BaseModel):
+    """Leaderboard entry for a player."""
+
     name: Optional[str] = Field(
         default=None, min_length=1, max_length=10, pattern=r"^[a-zA-Z0-9 ]+$"
     )
@@ -29,4 +37,6 @@ class Player(BaseModel):
 
 
 class HighScore(BaseModel):
+    """Container for the top leaderboard players."""
+
     best_players: list[Player] = []

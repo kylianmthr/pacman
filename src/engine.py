@@ -1,3 +1,5 @@
+"""Game engine orchestration for menus, gameplay, and audio."""
+
 import pygame
 import os
 from typing import Any, cast
@@ -10,7 +12,14 @@ from src.music import Music
 
 
 class Engine:
+    """Coordinate the main game loop and shared game state."""
+
     def __init__(self, config: Config) -> None:
+        """Initialize engine state from configuration.
+
+        Args:
+            config: Parsed game configuration.
+        """
         os.environ["SDL_VIDEO_CENTERED"] = "1"
         self.color = "white"
         self.config = config
@@ -56,12 +65,14 @@ class Engine:
         self.music.start_music()
 
     def change_wall_color(self) -> None:
+        """Update all wall sprites to match the current engine color."""
         for wall in self.game.walls:
             typed_wall = cast(Any, wall)
             typed_wall.color = self.color
             typed_wall.image.fill(self.color)
 
     def next_level(self) -> None:
+        """Advance to the next level or show the final menu."""
         if len(self.levels) - 1 == self.level:
             self.menu.switch_menu("game_finished_menu")
         else:
@@ -87,6 +98,7 @@ class Engine:
             self.loading = False
 
     def event(self) -> None:
+        """Handle input events and quit requests."""
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if self.menu_active:
@@ -98,6 +110,7 @@ class Engine:
                 self.running = False
 
     def run(self) -> None:
+        """Start the game loop until the engine is stopped."""
         pygame.init()
 
         while self.running:

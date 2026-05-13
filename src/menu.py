@@ -1,3 +1,5 @@
+"""Menu system for navigating game screens."""
+
 import pygame
 from typing import Any
 from src.leader_board_menu import LeaderBoardMenu
@@ -7,7 +9,15 @@ from src.menu_sprites import Box, Picture, Button
 
 
 class HelpMenu:
+    """Display the help screen with a return option."""
+
     def __init__(self, engine: Any, root_menu: Any) -> None:
+        """Initialize help menu assets.
+
+        Args:
+            engine: Engine instance for screen sizing and rendering.
+            root_menu: Parent menu for switching views.
+        """
         self.root_menu = root_menu
         self.engine = engine
         self.assets: Any = pygame.sprite.Group()
@@ -61,20 +71,34 @@ class HelpMenu:
         )
 
     def draw(self) -> None:
+        """Draw the help menu assets."""
         self.assets.draw(self.engine.screen)
 
     def show(
         self,
     ) -> None:
+        """Render the help menu to the screen."""
         self.assets.draw(self.engine.screen)
 
     def event(self, event: pygame.event.Event) -> None:
+        """Handle input events for the help menu.
+
+        Args:
+            event: Pygame event to process.
+        """
         if event.key == pygame.K_RETURN:
             self.root_menu.switch_menu("welcome_menu")
 
 
 class Menu:
+    """Top-level menu router for the game's menu screens."""
+
     def __init__(self, engine: Any) -> None:
+        """Initialize menu screens and shared fonts.
+
+        Args:
+            engine: Engine instance for screen sizing and rendering.
+        """
         pygame.font.init()
         self.pacfont = pygame.font.Font("./assets/PAC-FONT.TTF", 35)
         self.montserrat = pygame.font.Font("./assets/montserrat.ttf", 15)
@@ -93,9 +117,15 @@ class Menu:
         self.current_menu: Any = self.welcome_menu
 
     def show(self) -> None:
+        """Display the currently active menu."""
         self.current_menu.show()
 
     def switch_menu(self, menu_to_switch: str) -> None:
+        """Switch the active menu by name.
+
+        Args:
+            menu_to_switch: Identifier for the menu to activate.
+        """
         self.engine.menu_active = True
         if menu_to_switch == "help_menu":
             self.current_menu = self.help_menu
@@ -113,4 +143,9 @@ class Menu:
         self.current_menu.show()
 
     def event(self, event: pygame.event.Event) -> None:
+        """Forward input events to the active menu.
+
+        Args:
+            event: Pygame event to process.
+        """
         self.current_menu.event(event)

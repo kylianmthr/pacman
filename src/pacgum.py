@@ -1,8 +1,18 @@
+"""Pacgum sprite definitions."""
+
 import pygame
 
 
 class Pacgum(pygame.sprite.Sprite):
+    """Sprite representing a pacgum or super pacgum."""
+
     def __init__(self, radius: int, coordinates: tuple[int, int]) -> None:
+        """Initialize the pacgum sprite.
+
+        Args:
+            radius: Radius of the pacgum in pixels.
+            coordinates: Center coordinates for placement.
+        """
         super().__init__()
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((radius * 2, radius * 2))

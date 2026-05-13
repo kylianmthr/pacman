@@ -1,3 +1,5 @@
+"""Main gameplay state and update loop for a single level."""
+
 import pygame
 from src.cheat import Cheats
 from src.pacgum import Pacgum
@@ -9,6 +11,8 @@ from typing import Any, cast
 
 
 class Game:
+    """Manage the maze, sprites, and gameplay logic for a level."""
+
     def __init__(
         self,
         engine: Any,
@@ -23,6 +27,21 @@ class Game:
         level_max_time: int,
         pacgum: int,
     ) -> None:
+        """Initialize level state, sprites, and scoring.
+
+        Args:
+            engine: Owning engine instance.
+            screen: Pygame surface used for rendering.
+            width: Maze width in cells.
+            height: Maze height in cells.
+            seed: Random seed for the first level.
+            points_per_pacgum: Score for a regular pacgum.
+            points_per_super_pacgum: Score for a super pacgum.
+            points_per_ghost: Score for eating a ghost.
+            lives: Starting lives for the player.
+            level_max_time: Level duration in seconds.
+            pacgum: Number of pacgums to spawn.
+        """
         from src.game_sprites import (
             Player,
             PinkGhost,
@@ -87,6 +106,7 @@ class Game:
         self.cheats = Cheats(self)
 
     def create_walls(self) -> None:
+        """Build wall sprites based on the generated maze."""
         offset_y = 0
         for row in self.maze.maze:
             offset_x = 0
@@ -112,6 +132,7 @@ class Game:
         self.sprites.add(right_wall)
 
     def get_superpacgum(self) -> list[tuple[int, int]]:
+        """Return the corner coordinates for super pacgums."""
         return [
             (0, 0),
             (self.width - 1, 0),
@@ -120,6 +141,7 @@ class Game:
         ]
 
     def create_pacgums(self) -> None:
+        """Populate the maze with pacgum and super pacgum sprites."""
         offset_y = 23
         y = 0
         superpacugums = self.get_superpacgum()
@@ -155,6 +177,7 @@ class Game:
             offset_y += 40
 
     def respawn(self) -> None:
+        """Respawn the player and reset ghost positions after a hit."""
         self.lives -= 1
         self.player.rect.x = (self.width - 1) // 2 * 40 + 10
         self.player.rect.y = (self.height - 1) // 2 * 40 + 10
@@ -179,6 +202,7 @@ class Game:
             )
 
     def event(self, event: pygame.event.Event) -> None:
+        """Handle gameplay events such as movement and pause."""
         from src.game_sprites import Direction
 
         self.cheats.event(event)
@@ -200,6 +224,7 @@ class Game:
                     self.engine.running = False
 
     def update(self) -> None:
+        """Update all sprites, draw the frame, and check level state."""
         self.sprites.update()
         self.screen.fill("black")
         self.sprites.draw(self.screen)
