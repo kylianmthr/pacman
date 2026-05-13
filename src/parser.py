@@ -2,8 +2,21 @@
 
 from typing import Optional
 import json5
-from src.models import Config
+from src.models import Config, LevelType
 from pydantic import ValidationError
+from typing import TypedDict, List
+
+
+class GameConfig(TypedDict):
+    highscore_filename: str
+    level: List[LevelType]
+    lives: int
+    pacgum: int
+    points_per_pacgum: int
+    points_per_super_pacgum: int
+    points_per_ghost: int
+    seed: int
+    level_max_time: int
 
 
 class Parser:
@@ -37,11 +50,11 @@ class Parser:
         Raises:
             ValueError: If the file is empty or has not been loaded.
         """
-        valid_config = {
+        valid_config: GameConfig = {
             "highscore_filename": "test",
             "level": [
-                {"width": 10, "height": 10},
-                {"width": 10, "height": 10},
+                LevelType(width=10, height=10),
+                LevelType(width=10, height=10),
             ],
             "lives": 5,
             "pacgum": 5,
